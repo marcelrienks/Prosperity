@@ -2,6 +2,16 @@
 
 This directory contains individual issue files for tracking the development progress of the Prosperity personal portfolio management application.
 
+## GitHub Synchronization Status
+📌 **6 of 9** issues are currently synchronized with GitHub  
+⚠️ **3 issues** need to be created: Phase 4, Phase 5, and Phase 6
+
+See the root directory files for automation scripts:
+- `create-missing-issues.sh` - Automated creation using GitHub CLI
+- `create-issues.py` - Automated creation using Python
+- `GITHUB_ISSUES_SUMMARY.md` - Full details for all issues
+- `INSTRUCTIONS.md` - Step-by-step guide for creating issues
+
 ## Issue Status Legend
 - ✅ **COMPLETED** - Issue has been fully completed and delivered
 - 🚧 **IN PROGRESS** - Issue is currently being worked on
