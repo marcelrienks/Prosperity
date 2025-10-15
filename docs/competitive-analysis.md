@@ -64,17 +64,10 @@ This analysis examines popular stock portfolio management applications to identi
    - Backup/restore functionality
    - Transaction history
 
-### Future Considerations
-1. Dividend tracking
-2. Price alerts/notifications
-3. Advanced reporting
-4. Mobile-optimized views
-5. Historical performance charts
-
 ---
 
 ## Conclusion
 
 The competitive landscape shows that successful portfolio managers balance simplicity with functionality. For a personal application, the key is to avoid the complexity that makes commercial solutions overwhelming while providing the essential features that make tracking investments valuable and actionable.
 
-Prosperity should focus on being the "Goldilocks" solution - not too simple like basic trackers, not too complex like professional platforms, but just right for personal investment management with Canadian-specific considerations.
+Prosperity should focus on being the "Goldilocks" solution - not too simple like basic trackers, not too complex like professional platforms, but just right for personal investment management with South African-specific considerations.

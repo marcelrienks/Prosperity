@@ -25,11 +25,6 @@
 - 🌓 **Light/Dark Themes** - Customizable appearance
 - ⚙️ **Configurable Settings** - Customize exchanges, industries, types, and actions
 
-### Current Status
-- ✅ **Discovery & Requirements** - Complete
-- ✅ **Architecture & Design** - Complete
-- 🔄 **Core Development (MVP)** - In Progress
-
 ---
 
 ## 🏗️ Architecture Overview
@@ -225,69 +220,33 @@ Organize investments across multiple account types:
 
 ---
 
-## 🗺️ Project Roadmap
+## � Project Documentation
 
-### ✅ Discovery & Requirements (Complete)
-- [x] Competitive analysis
-- [x] Stakeholder requirements gathering
-- [x] MVP feature definition
-- [x] User stories and acceptance criteria
+### Completed Planning
+- ✅ Competitive analysis
+- ✅ Stakeholder requirements gathering
+- ✅ MVP feature definition
+- ✅ User stories and acceptance criteria
+- ✅ System architecture design
+- ✅ Technology selection and justification
+- ✅ Database schema design
+- ✅ API design and specification
+- ✅ Security and compliance planning
+- ✅ Visual documentation (25 diagrams)
 
-### ✅ Architecture & Design (Complete)
-- [x] System architecture design
-- [x] Technology selection and justification
-- [x] Database schema design
-- [x] API design and specification
-- [x] Security and compliance planning
-- [x] Visual documentation (25 diagrams)
-
-### 🔄 Core Development - MVP (In Progress)
-**Target: Q1 2026**
-- [ ] Setup development environment
-- [ ] Initialize project structure (Blazor + Go)
-- [ ] Implement authentication (JWT)
-- [ ] Build Dashboard page
-- [ ] Build Investments page (CRUD operations)
-- [ ] Build Deposits & Transfers page
-- [ ] Build Settings page
-- [ ] Integrate Google Finance API
-- [ ] Integrate ExchangeRate-API
-- [ ] Implement CSV import/export
-- [ ] Setup CI/CD pipelines (GitHub Actions)
-
-### ⏳ Testing & QA
-- [ ] Unit testing
-- [ ] Integration testing
-- [ ] End-to-end testing
-- [ ] User acceptance testing
-- [ ] Performance testing
-
-### ⏳ Deployment
-- [ ] Production infrastructure setup
-- [ ] Database migration
-- [ ] Data import from Excel
-- [ ] Go-live
-- [ ] Monitoring and alerting
-
-### ⏳ Iteration & Enhancement
-- [ ] User feedback collection
-- [ ] Bug fixes and optimizations
-- [ ] Feature enhancements
-- [ ] Performance improvements
-
-[📅 View Detailed Roadmap](docs/project-roadmap.md)
+[� View Project Status](docs/project-roadmap.md)
 
 ---
 
-## 📊 Project Statistics
+## 📊 Architecture Summary
 
-### Documentation
+### Documentation Statistics
 - **Total Pages:** ~145 pages
 - **Diagrams:** 25 Mermaid diagrams
 - **User Stories:** 20+ stories
 - **API Endpoints:** 15+ endpoints
 
-### Architecture
+### Architecture Components
 - **Frontend Components:** 10+ pages and shared components
 - **Backend Handlers:** 5 main handler groups
 - **Database Collections:** 4 main collections
@@ -518,22 +477,6 @@ The project will be considered successful if it:
 
 ### Post-MVP Features
 - 📊 Advanced charting (Chart.js, D3.js)
-- 📱 Progressive Web App (PWA) with offline support
-- 🌙 Enhanced dark mode
-- 📄 PDF export for reports
-- 📧 Email notifications for price alerts
-- 📉 Historical performance tracking
-- 🔔 Dividend payment reminders
-
-### Multi-User Considerations
-If expanding beyond personal use:
-- Role-based access control (RBAC)
-- User management admin panel
-- Subscription/billing integration (Stripe)
-- Enhanced monitoring and logging
-- Multi-region deployment
-- Compliance (GDPR, data residency)
-
 ---
 
 ## 📝 Outstanding Planning Items

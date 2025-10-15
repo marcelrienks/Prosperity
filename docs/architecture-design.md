@@ -533,6 +533,8 @@ func (r *AccountRepository) Update(account *Account) error
   "passwordHash": "bcrypt_hash_here",
   "firstName": "Marcel",
   "lastName": "Rienks",
+  "role": "Admin",
+  "status": "Active",
   "createdAt": "2025-10-15T10:00:00Z",
   "lastLogin": "2025-10-15T10:30:00Z"
 }
@@ -615,15 +617,34 @@ func (r *AccountRepository) Update(account *Account) error
 }
 ```
 
+#### Collection: `auditlogs`
+```json
+{
+  "id": "log_001",
+  "userId": "user_123",
+  "userEmail": "user@example.com",
+  "action": "USER_LOGIN",
+  "resourceType": "User",
+  "resourceId": "user_123",
+  "ipAddress": "192.168.1.1",
+  "result": "Success",
+  "details": {
+    "userAgent": "Mozilla/5.0...",
+    "location": "Cape Town, ZA"
+  },
+  "timestamp": "2025-10-15T10:00:00Z"
+}
+```
+
 ### Partition Strategy
 
 **Partition Key:** `userId`
 
 **Rationale:**
-- Single-user application (one partition for now)
-- Future-proof for multi-user expansion
+- Scalable for multi-user application
 - All queries scoped by userId
 - Efficient query performance within user's data
+- Admin users can query across partitions when needed
 
 ### Indexing Strategy
 
@@ -633,6 +654,8 @@ func (r *AccountRepository) Update(account *Account) error
   - `accountId`
   - `ticker`
   - `date` (for transactions and dividends)
+  - `timestamp` (for audit logs)
+  - `role` and `status` (for user queries)
 
 ---
 
@@ -678,6 +701,20 @@ func (r *AccountRepository) Update(account *Account) error
 | POST   | `/api/dividends`      | Create new dividend entry    | Yes           |
 | PUT    | `/api/dividends/{id}` | Update dividend              | Yes           |
 | DELETE | `/api/dividends/{id}` | Delete dividend              | Yes           |
+
+#### Admin (Role: Admin only)
+
+| Method | Endpoint                    | Description                       | Auth Required | Role Required |
+|--------|----------------------------|-----------------------------------|---------------|---------------|
+| GET    | `/api/admin/users`         | List all users                    | Yes           | Admin         |
+| GET    | `/api/admin/users/{id}`    | Get user by ID                    | Yes           | Admin         |
+| POST   | `/api/admin/users`         | Create new user                   | Yes           | Admin         |
+| PUT    | `/api/admin/users/{id}`    | Update user (name, email, role)   | Yes           | Admin         |
+| DELETE | `/api/admin/users/{id}`    | Delete user                       | Yes           | Admin         |
+| PUT    | `/api/admin/users/{id}/status` | Activate/deactivate user      | Yes           | Admin         |
+| POST   | `/api/admin/users/{id}/reset-password` | Generate password reset | Yes           | Admin         |
+| GET    | `/api/admin/audit-logs`    | Get audit logs                    | Yes           | Admin         |
+| GET    | `/api/admin/audit-logs/user/{id}` | Get audit logs for specific user | Yes        | Admin         |
 
 #### Prices
 
@@ -1237,23 +1274,7 @@ jobs:
 If expanding beyond personal use:
 - Implement proper role-based access control
 - Add user management admin panel
-- Subscription/billing integration (Stripe)
-- Enhanced monitoring and logging
-- Multi-region deployment
-- Compliance considerations (GDPR, data residency)
 
-### Technology Migrations
-
-**If Go + Azure Functions proves challenging:**
-- Fallback: .NET 8 Azure Functions (C#)
-- Leverage existing .NET knowledge
-- Easier Azure Functions integration
-- Shared models between frontend and backend
-
-**If Cosmos DB costs exceed budget:**
-- Migrate to Azure SQL Database serverless tier
-- Or PostgreSQL on Azure
-- Schema migration scripts required
 
 ---
 
@@ -1351,6 +1372,6 @@ If expanding beyond personal use:
 ---
 
 **Document Status:** ✅ Approved  
-**Last Updated:** October 15, 2025  
-**Next Review:** Core Development Planning
+**Last Updated:** October 15, 2025
+
 

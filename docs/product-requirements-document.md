@@ -140,6 +140,7 @@ The MVP will be considered successful if it meets the following criteria:
 2. **Investments Page** - Detailed holdings management with expandable accounts
 3. **Deposits & Transfers Page** - Transaction history and cash flow tracking
 4. **Settings Page** - Application configuration and customization
+5. **Admin Panel** - User management and system administration (Admin role only)
 
 #### Core Features
 - Manual stock entry (ticker, quantity, price, date)
@@ -154,6 +155,9 @@ The MVP will be considered successful if it meets the following criteria:
 - Responsive design (desktop and mobile)
 - Light/Dark theme support
 - User authentication (email/password)
+- **Role-based access control** (Admin, Owner, Viewer)
+- **User management admin panel**
+- **Audit trail logging**
 - Bulk data import/export (CSV format)
 - Customizable dropdown options (exchange, industry, type, action, currency)
 
@@ -908,6 +912,142 @@ Investments Page
 
 ---
 
+### FR-7: User Management & Role-Based Access Control
+
+**Purpose:** Enable proper user management with role-based permissions for multi-user scenarios.
+
+#### FR-7.1: User Roles
+**Description:** Define and implement user roles with specific permissions.
+
+**Roles:**
+- **Admin** - Full system access including user management
+  - View/edit all portfolios
+  - Manage all users (create, edit, delete, change roles)
+  - Access admin panel
+  - Configure global settings
+  - View system logs and audit trails
+
+- **Owner** - Full access to own portfolio
+  - View/edit own holdings, accounts, deposits, transfers
+  - Manage own settings and preferences
+  - Import/export own data
+  - Cannot access other users' data
+  - Cannot access admin panel
+
+- **Viewer** - Read-only access to assigned portfolios
+  - View assigned portfolio data
+  - Cannot create, edit, or delete any data
+  - Cannot change settings
+  - Cannot import/export data
+
+**Acceptance Criteria:**
+- [ ] User role stored in database
+- [ ] Role assigned during user creation
+- [ ] Role determines accessible features
+- [ ] API endpoints enforce role-based permissions
+- [ ] UI elements hidden based on user role
+
+#### FR-7.2: Admin Panel
+**Description:** Dedicated administrative interface for user management.
+
+**Features:**
+- User list with search and filter
+- View user details (name, email, role, created date, last login)
+- Create new users
+- Edit user information (name, email, role)
+- Reset user passwords
+- Deactivate/activate user accounts
+- Delete users (with confirmation)
+- View user activity logs
+
+**Access:**
+- Accessible only to Admin role users
+- Menu item "Admin" in navigation (visible only to admins)
+- Route: `/admin`
+
+**User List Display:**
+| Name | Email | Role | Status | Last Login | Actions |
+|------|-------|------|--------|------------|---------|
+| John Doe | john@example.com | Owner | Active | 2025-10-15 | Edit, Deactivate |
+| Jane Smith | jane@example.com | Viewer | Active | 2025-10-14 | Edit, Deactivate |
+
+**Actions:**
+- Edit (opens edit form modal/page)
+- Deactivate/Activate (toggles user status)
+- Delete (shows confirmation dialog)
+- Reset Password (generates reset link)
+
+**Acceptance Criteria:**
+- [ ] Admin panel accessible to Admin users only
+- [ ] User list displays all users with pagination
+- [ ] Search and filter by name, email, role, status
+- [ ] Create user form with role selection
+- [ ] Edit user form allows changing name, email, role
+- [ ] Password reset generates secure link
+- [ ] Deactivate prevents user login
+- [ ] Delete removes user with confirmation
+- [ ] Activity log shows user actions
+
+#### FR-7.3: Permission Enforcement
+**Description:** Enforce role-based permissions throughout the application.
+
+**Backend Enforcement:**
+- JWT token includes user ID and role
+- All API endpoints validate user role
+- Endpoints return 403 Forbidden for unauthorized access
+- Data queries scoped by userId (except Admin who can view all)
+
+**Frontend Enforcement:**
+- UI elements hidden/disabled based on role
+- Menu items filtered by role
+- Buttons (Add, Edit, Delete) hidden for Viewer role
+- Admin panel visible only to Admin role
+- Redirect to appropriate page if accessing unauthorized route
+
+**Data Isolation:**
+- Owner users see only their own data
+- Viewer users see only portfolios they're granted access to
+- Admin users can view/manage all data
+- All database queries include userId filter (except for Admin)
+
+**Acceptance Criteria:**
+- [ ] JWT includes userId and role claims
+- [ ] API validates role on every request
+- [ ] Unauthorized requests return 403
+- [ ] UI elements hidden based on permissions
+- [ ] Data queries properly scoped by user
+- [ ] Admin can access all data
+- [ ] Users cannot access others' data
+
+#### FR-7.4: Audit Trail
+**Description:** Track user actions for security and compliance.
+
+**Logged Actions:**
+- User login/logout
+- Failed login attempts
+- User creation/modification/deletion
+- Role changes
+- Portfolio data changes (create, update, delete)
+- Settings modifications
+- Data import/export operations
+
+**Log Information:**
+- Timestamp
+- User ID and email
+- Action type
+- Resource affected (holding, account, etc.)
+- IP address
+- Result (success/failure)
+
+**Acceptance Criteria:**
+- [ ] All user actions logged to database
+- [ ] Logs include timestamp, user, action, resource
+- [ ] Admin can view audit logs
+- [ ] Logs retained for compliance period
+- [ ] Failed login attempts tracked
+
+---
+
 ## Non-Functional Requirements
 
 ### NFR-1: Performance
@@ -1222,6 +1362,8 @@ Investments Page
 - `passwordHash` (bcrypt)
 - `firstName`
 - `lastName`
+- **`role`** (enum: "Admin", "Owner", "Viewer")
+- **`status`** (enum: "Active", "Inactive")
 - `createdAt` (timestamp)
 - `lastLogin` (timestamp)
 - `preferences` (JSON: theme, dateFormat, etc.)
@@ -1271,6 +1413,18 @@ Investments Page
 - `currency` (e.g., "ZAR", "USD")
 - `description` (optional text)
 - `createdAt` (timestamp)
+
+**AuditLog** (New)
+- `id` (UUID)
+- `userId` (foreign key, indexed)
+- `userEmail` (for reference)
+- `action` (e.g., "USER_LOGIN", "USER_CREATED", "HOLDING_UPDATED", "ROLE_CHANGED")
+- `resourceType` (e.g., "User", "Holding", "Account")
+- `resourceId` (UUID of affected resource, nullable)
+- `ipAddress` (string)
+- `result` (enum: "Success", "Failure")
+- `details` (JSON: additional context)
+- `timestamp` (timestamp, indexed)
 
 **Settings** (User Preferences)
 - Stored in `User.preferences` JSON field or separate Settings table
@@ -1850,9 +2004,9 @@ The following features are explicitly **not included in the MVP** and may be con
 ---
 
 **Document Status:** ✅ Final  
-**Last Updated:** October 15, 2025  
-**Next Steps:** Begin Core Development (MVP Implementation)
+**Last Updated:** October 15, 2025
 
 ---
 
 *End of Product Requirements Document*
+
