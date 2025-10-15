@@ -113,7 +113,6 @@ docs/
 **MVP Features:**
 - Summary Dashboard
 - Investments Page with expandable accounts
-- Annualised Dividends Report
 - Manual data entry
 - Real-time price updates
 - Multi-currency support (ZAR, USD, EUR)

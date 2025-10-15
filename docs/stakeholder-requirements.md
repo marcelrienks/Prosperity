@@ -20,7 +20,7 @@ The current portfolio management system consists of four worksheets:
 1. **Summary Sheet** - High-level portfolio overview across all accounts
 2. **Investments Sheet** - Detailed holdings with 54 stocks across 5 accounts
 3. **Deposits Sheet** - Transaction and deposit history
-4. **Annualised Sheet** - Dividend and deposit tracking for annualized calculations
+4. **Annualised Sheet** - Deposit tracking for annualized calculations
 
 ### Key Accounts Currently Managed
 - **ZA** - South African stocks (JSE-listed)
@@ -36,7 +36,6 @@ The current portfolio management system consists of four worksheets:
 - Current value with live price integration
 - Profit/loss (absolute and percentage)
 - Historical profit/loss changes
-- Dividend payments and dates
 
 ---
 
@@ -198,8 +197,6 @@ For each stock/holding, display:
 - PDF report generation
 - Date range filtering
 
-**Note:** Dividends are not tracked separately. When dividends are paid out, they should be reflected in the account's cash balance, which can then be reinvested.
-
 ---
 
 ## Additional Feature Requirements
@@ -312,7 +309,6 @@ For each stock/holding, display:
 
 ### Out of Scope for MVP:
 - Advanced charting and visualizations
-- Separate dividend tracking (dividends managed via cash balance)
 - Price alerts and notifications
 - Tax reporting tools
 - Historical performance charts
@@ -401,7 +397,7 @@ For each stock/holding, display:
 The MVP will be considered successful if it:
 1. ✅ Replicates all current Excel functionality
 2. ✅ Provides real-time price updates (removing manual Google Finance checks)
-3. ✅ Displays summary, investments, and dividends pages correctly
+3. ✅ Displays summary and investments pages correctly
 4. ✅ Calculates all profit/loss and totals automatically
 5. ✅ Supports all 5 current accounts (ZA, TFSA, US, EUR, Prop)
 6. ✅ Handles multi-currency conversions accurately

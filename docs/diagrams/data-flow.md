@@ -218,7 +218,6 @@ flowchart TD
     TransferIn[Transfer In] -->|+ Amount| Account
     TransferOut[Transfer Out] -->|-Amount| Account
     Purchase[Stock Purchase<br/>Optional] -->|-Amount| Account
-    Dividend[Dividend Payment<br/>Manual Entry] -->|+ Amount| Account
     Manual[Manual Adjustment] -->|+/- Amount| Account
     
     Account --> Check{Balance >= 0?}
@@ -230,7 +229,6 @@ flowchart TD
     style Account fill:#d4edda
     style Deposit fill:#e1f5ff
     style TransferIn fill:#e1f5ff
-    style Dividend fill:#e1f5ff
     style Manual fill:#e1f5ff
     style TransferOut fill:#f8d7da
     style Purchase fill:#f8d7da
@@ -248,8 +246,7 @@ flowchart LR
         Start -->|+| Deposits[All Deposits]
         Deposits -->|+| TransIn[Transfers In]
         TransIn -->|-| TransOut[Transfers Out]
-        TransOut -->|+| Divs[Dividends]
-        Divs -->|-| Purch[Purchases<br/>if enabled]
+        TransOut -->|-| Purch[Purchases<br/>if enabled]
         Purch -->|+/-| Adj[Manual Adjustments]
         
         Adj --> Final[Current Cash Balance]

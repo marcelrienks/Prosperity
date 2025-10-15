@@ -70,7 +70,6 @@ Prosperity is a **multi-user portfolio management application** designed to mode
 - Social features or portfolio sharing beyond defined user roles
 - Advanced financial modeling or investment advice
 - Mobile native applications (web-only responsive design)
-- Separate dividend tracking (managed via cash balance updates)
 - Historical price caching or storage
 
 ---
@@ -174,7 +173,6 @@ The MVP will be considered successful if it meets the following criteria:
 
 #### Deferred to Post-MVP or Future
 - Advanced charting and visualizations (beyond basic P/L display)
-- Separate dividend tracking (dividends managed via cash balance)
 - Price alerts and notifications
 - Historical performance charts and trend analysis
 - Tax reporting and SARS integration
@@ -743,7 +741,7 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 - **Transfers In:** Cash Balance += Transfer Amount
 - **Transfers Out:** Cash Balance -= Transfer Amount
 - **Stock Purchases:** When adding or editing a holding with increased investment, optionally decrease Cash Balance by the additional investment (user preference in Settings)
-- **Dividends:** Cash Balance += Dividend Amount (manual entry as deposit or automatic if configured)
+- **Manual Adjustments:** Cash Balance can be adjusted manually for any reason (interest, corrections, etc.)
 
 **Display Requirements:**
 - Cash balance displayed on Summary Dashboard per account
@@ -759,7 +757,7 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 - [ ] Manual adjustments allowed with audit trail
 
 #### FR-4.2: Manual Cash Adjustment
-**Description:** Allow direct adjustment of cash balance (for dividends, interest, corrections).
+**Description:** Allow direct adjustment of cash balance for interest, corrections, or other manual updates.
 
 **Behavior:**
 - "Adjust Cash" button on account summary
@@ -1933,7 +1931,6 @@ The following features are explicitly **not included in the MVP** and may be con
 - Historical performance tracking and trending
 - Tax reporting and SARS integration
 - Price alerts and notifications (email, push, SMS)
-- Automated dividend capture from external sources
 - Portfolio optimization and rebalancing suggestions
 - Benchmark comparison (vs. S&P 500, JSE All Share Index)
 - Sector allocation analysis

@@ -146,7 +146,7 @@ This document outlines the technical architecture for **Prosperity**, a personal
 
 **Schema Design:**
 - Partition Key: `userId` (single user, but future-proof)
-- Collections: `accounts`, `holdings`, `transactions`, `dividends`, `users`
+- Collections: `accounts`, `holdings`, `transactions`, `users`
 
 **Option B: Azure SQL Database**
 - Serverless tier available
@@ -236,7 +236,6 @@ This document outlines the technical architecture for **Prosperity**, a personal
 │  │  │  - POST /api/holdings                             │ │ │
 │  │  │  - PUT  /api/holdings/{id}                        │ │ │
 │  │  │  - DELETE /api/holdings/{id}                      │ │ │
-│  │  │  - GET  /api/dividends                            │ │ │
 │  │  │  - POST /api/auth/login                           │ │ │
 │  │  │  - GET  /api/prices/refresh                       │ │ │
 │  │  └───────────────────────────────────────────────────┘ │ │
