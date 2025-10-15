@@ -133,7 +133,7 @@ The MVP will be considered successful if it meets the following criteria:
 
 ## Product Scope
 
-### In Scope (MVP - Phase 1)
+### In Scope (MVP)
 
 #### Core Pages
 1. **Summary Dashboard** - Portfolio overview across all accounts
@@ -159,7 +159,7 @@ The MVP will be considered successful if it meets the following criteria:
 
 ### Out of Scope (MVP)
 
-#### Deferred to Phase 2 or Future
+#### Deferred to Post-MVP or Future
 - Advanced charting and visualizations (beyond basic P/L display)
 - Dividend tracking beyond account cash balance updates
 - Price alerts and notifications
@@ -1851,7 +1851,7 @@ The following features are explicitly **not included in the MVP** and may be con
 
 **Document Status:** ✅ Final  
 **Last Updated:** October 15, 2025  
-**Next Steps:** Begin Phase 3 - Core Development (MVP Implementation)
+**Next Steps:** Begin Core Development (MVP Implementation)
 
 ---
 

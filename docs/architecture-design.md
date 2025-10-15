@@ -1121,7 +1121,7 @@ jobs:
 **CDN & Caching:**
 - CloudFront caching for static assets
 - Browser caching headers
-- Service Worker for offline capability (Phase 2)
+- Service Worker for offline capability (post-MVP)
 
 ### Scalability Considerations
 
@@ -1214,7 +1214,7 @@ jobs:
 
 ## Future Considerations
 
-### Phase 2 Enhancements
+### Post-MVP Enhancements
 
 **Frontend:**
 - Progressive Web App (PWA) with offline support
@@ -1352,4 +1352,5 @@ If expanding beyond personal use:
 
 **Document Status:** ✅ Approved  
 **Last Updated:** October 15, 2025  
-**Next Review:** Phase 3 - Core Development Planning
+**Next Review:** Core Development Planning
+

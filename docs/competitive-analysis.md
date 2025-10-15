@@ -32,7 +32,7 @@ This analysis examines popular stock portfolio management applications to identi
 
 ## Recommendations for Prosperity MVP
 
-### Core Features (Phase 1)
+### Core MVP Features
 1. **Manual Portfolio Entry System**
    - Add stocks by ticker symbol
    - Record purchase date, quantity, price
@@ -53,7 +53,7 @@ This analysis examines popular stock portfolio management applications to identi
    - Account summaries
    - Top performers/losers
 
-### Enhanced Features (Phase 2)
+### Post-MVP Features
 1. **Performance Analytics**
    - Time-based performance tracking
    - Simple charts and graphs
