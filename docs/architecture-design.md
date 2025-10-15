@@ -45,6 +45,7 @@ This document outlines the technical architecture for **Prosperity**, a personal
 - Leverage existing AWS infrastructure for static hosting and domain management
 - Utilize Azure for backend services to gain exposure to Azure ecosystem
 - Accept cross-cloud complexity as a learning investment
+- Support multi-user access with role-based permissions
 
 **2. Serverless-First Approach**
 - Eliminate always-on infrastructure costs
@@ -65,9 +66,10 @@ This document outlines the technical architecture for **Prosperity**, a personal
 - Free tiers where possible (Azure Functions consumption plan)
 
 **5. Simplicity Over Complexity**
-- Single-user application (no multi-tenancy complexity)
+- Multi-user application with role-based access control
 - Manual data entry focus (no complex broker integrations)
 - Straightforward CRUD operations
+- Real-time data queries (no caching complexity)
 - Minimal state management
 
 ---

@@ -155,55 +155,50 @@ For each stock/holding, display:
 
 ---
 
-### 3. Annualised Dividends Report
+### 3. Annualised Returns Report
 
-**Purpose:** Track dividend income and deposit history for annualized return calculations.
+**Purpose:** Track deposit history and total portfolio value for annualized return calculations.
 
 **Data Structure:**
-- **Date** - Transaction/dividend date
-- **Amount** - Dividend received (positive) or deposit made (negative)
-- **Type** - Dividend vs Deposit (automatically determined by sign)
-- **Account** - Which account received/deposited (future enhancement)
-- **Stock** - Which holding paid dividend (future enhancement)
+- **Date** - Transaction date
+- **Total Deposited** - Sum of all deposits minus withdrawals
+- **Total Portfolio Value** - Current value of all holdings plus cash
+- **Type** - Deposit, Withdrawal, or Transfer
 
 **Report Views:**
 
 **A. Chronological Transaction List**
-- Date-ordered list of all dividends and deposits
+- Date-ordered list of all deposits, withdrawals, and transfers
 - Running total calculations
 - Year-to-date summaries
 - Month-by-month breakdowns
 
-**B. Dividend Summary**
-- Total dividends received (all-time)
-- Dividends by year
-- Dividends by account
-- Average monthly dividend income
-- Dividend growth rate
-
-**C. Annualised Returns**
+**B. Annualised Returns Calculation**
 - IRR (Internal Rate of Return) calculation
 - XIRR for irregular cash flows
-- Annualized return percentage
+- Annualized return percentage based on deposits and current value
 - Time-weighted returns
 - Money-weighted returns
 
-**D. Deposit History**
+**C. Deposit & Withdrawal History**
 - Total deposits by year
 - Total deposits by account
+- Total withdrawals by year
+- Net capital contributions
 - Deposit frequency analysis
 - Average deposit amount
 
 **Visualizations:**
-- Line chart: Dividend income over time
-- Bar chart: Yearly deposit vs dividend comparison
-- Pie chart: Dividend sources by account
-- Growth chart: Cumulative returns
+- Line chart: Portfolio value over time
+- Bar chart: Yearly deposits vs withdrawals
+- Growth chart: Cumulative returns vs deposits
 
 **Export Capabilities:**
 - Export to CSV for tax reporting
 - PDF report generation
 - Date range filtering
+
+**Note:** Dividends are not tracked separately. When dividends are paid out, they should be reflected in the account's cash balance, which can then be reinvested.
 
 ---
 
@@ -248,15 +243,15 @@ For each stock/holding, display:
 - Session management
 - Password reset functionality
 
-### 9. Data Refresh & Historical Data
+### 9. Data Refresh & Price Updates
 - **Price Updates:**
-  - Real-time during market hours (15-min delay acceptable)
-  - Daily end-of-day updates
-  - Manual refresh button
+  - Real-time queries via Google Finance API (no caching)
+  - Fetched on-demand when viewing portfolio
+  - Manual refresh button available
 - **Historical Data:**
-  - Maintain 5+ years of price history
-  - Track historical profit/loss changes
-  - Preserve dividend payment history
+  - Historical prices not stored locally
+  - Retrieved from Google Finance API as needed
+  - Transaction history maintained for analysis
 
 ### 10. Mobile/Responsive Design
 - Fully responsive web application
@@ -275,24 +270,25 @@ For each stock/holding, display:
 |----------------------------------------|-----|---------|--------|
 | Summary Dashboard                      | X   |         |        |
 | Investments Page (expandable accounts) | X   |         |        |
-| Annualised Dividends Report            | X   |         |        |
+| Annualised Returns Report              | X   |         |        |
 | Manual stock entry                     | X   |         |        |
-| Real-time price updates                | X   |         |        |
+| Real-time price updates (Google Finance) | X   |         |        |
 | Multi-currency support (ZAR, USD, EUR) | X   |         |        |
 | Profit/loss calculations               | X   |         |        |
 | Account management (5 accounts)        | X   |         |        |
 | Stock classification (industry, type)  | X   |         |        |
-| Basic authentication                   | X   |         |        |
+| Multi-user authentication & RBAC       | X   |         |        |
+| Role-based access (Admin, Owner, Viewer) | X   |         |        |
 | Responsive mobile design               | X   |         |        |
 | Add/Edit/Delete holdings               | X   |         |        |
+| Deposits, Withdrawals & Transfers      | X   |         |        |
+| Transaction fees/costs tracking        | X   |         |        |
+| CSV import/export                      | X   |         |        |
 | Search and filter holdings             |     | X       |        |
-| Dividend entry and tracking            |     | X       |        |
-| CSV import/export                      |     | X       |        |
 | Advanced reporting (charts/graphs)     |     | X       |        |
 | Price alerts                           |     |         | X      |
 | Tax reporting                          |     |         | X      |
 | Historical performance charts          |     |         | X      |
-| Automatic dividend capture             |     |         | X      |
 | Portfolio rebalancing suggestions      |     |         | X      |
 | 2FA implementation                     |     |         | X      |
 
@@ -303,23 +299,26 @@ For each stock/holding, display:
 ### Core MVP Features:
 1. **Summary Dashboard** displaying all accounts with key metrics
 2. **Investments Page** with expandable account sections and full holdings management
-3. **Annualised Dividends Report** with transaction history and basic calculations
-4. **Manual data entry** for stocks, dividends, and deposits
-5. **Real-time price integration** using Google Finance or equivalent API
-6. **Multi-currency support** for ZAR, USD, and EUR
+3. **Annualised Returns Report** based on deposits and current portfolio value
+4. **Manual data entry** for stocks, deposits, withdrawals, and transfers
+5. **Real-time price integration** using Google Finance API
+6. **Multi-currency support** for ZAR, USD, and EUR with real-time conversion
 7. **Automatic calculations** for profit/loss, totals, and percentages
-8. **Basic authentication** with email/password
-9. **Responsive design** for desktop and mobile
-10. **Support for 5 account types** (ZA, TFSA, US, EUR, Prop)
+8. **Multi-user authentication** with role-based access control (Admin, Owner, Viewer)
+9. **Transaction costs/fees** tracking for purchases and sales
+10. **Responsive design** for desktop and mobile
+11. **CSV import/export** for data portability
+12. **Support for 5 account types** (ZA, TFSA, US, EUR, Prop)
 
 ### Out of Scope for MVP:
 - Advanced charting and visualizations
-- Automated dividend capture
-- CSV import/export
+- Separate dividend tracking (dividends managed via cash balance)
 - Price alerts and notifications
 - Tax reporting tools
-- Historical performance tracking
+- Historical performance charts
 - Portfolio optimization suggestions
+- Audit trail logging
+- Price/exchange rate caching
 
 ---
 
@@ -333,22 +332,25 @@ For each stock/holding, display:
 
 ### Investments Page
 5. As a user, I want to expand/collapse accounts so I can focus on specific holdings without clutter.
-6. As a user, I want to add new stock purchases with all relevant details so I can track my investments.
+6. As a user, I want to add new stock purchases with all relevant details including transaction costs so I can track my investments.
 7. As a user, I want to see real-time prices for my holdings so I know my current portfolio value.
 8. As a user, I want to edit holding details when I make additional purchases or corrections.
 9. As a user, I want to classify stocks by industry and type so I can analyze my portfolio allocation.
 10. As a user, I want to see each stock's profit/loss so I can identify winners and losers.
 
-### Annualised Dividends Report
-11. As a user, I want to track all dividend payments by date so I can monitor income generation.
-12. As a user, I want to see total dividends received so I can measure passive income.
-13. As a user, I want to view my deposit history so I can track capital contributions.
-14. As a user, I want to calculate annualized returns including dividends so I can assess true performance.
+### Annualised Returns Report
+11. As a user, I want to track all deposits and withdrawals by date so I can monitor capital contributions.
+12. As a user, I want to view my deposit history so I can track total invested capital.
+13. As a user, I want to calculate annualized returns based on deposits and current value so I can assess performance.
+14. As a user, I want to see my portfolio growth compared to total deposited so I can measure investment success.
 
 ### General
-15. As a user, I want to access the application securely so my financial data is protected.
-16. As a user, I want to use the app on my phone and desktop so I can check investments anywhere.
-17. As a user, I want the app to automatically calculate all values so I don't need manual Excel formulas.
+15. As a user, I want to access the application securely with role-based permissions so my financial data is protected.
+16. As an admin, I want to manage multiple users and assign roles so I can control access to the system.
+17. As a viewer, I want to see portfolio data without being able to make changes so I can monitor performance safely.
+18. As a user, I want to use the app on my phone and desktop so I can check investments anywhere.
+19. As a user, I want the app to automatically calculate all values so I don't need manual Excel formulas.
+20. As a user, I want to record transaction costs/fees so my profit calculations are accurate.
 
 ---
 
@@ -360,9 +362,10 @@ For each stock/holding, display:
 - **Future:** API integration with brokers for automatic syncing
 
 ### Price Data Source
-- **Primary:** Google Finance API or similar free/low-cost service
+- **Primary:** Google Finance API (real-time queries, no caching)
 - **Backup:** Manual price entry option
-- **Requirement:** Support for JSE, NYSE, NASDAQ exchanges
+- **Requirement:** Support for JSE, NYSE, NASDAQ, and international exchanges
+- **Currency Conversion:** Real-time exchange rates via Google Finance API
 
 ### Calculation Requirements
 - All profit/loss calculations automatic

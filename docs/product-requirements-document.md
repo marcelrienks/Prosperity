@@ -36,7 +36,9 @@
 - Eliminate manual Excel data entry and formula maintenance
 - Provide real-time stock price updates via Google Finance API
 - Support multiple investment accounts (TFSA, US, ZA, EUR, Property)
+- Support multi-user access with role-based permissions (Admin, Owner, Viewer)
 - Calculate profit/loss, returns, and portfolio performance automatically
+- Track transaction costs and fees for accurate profit calculations
 - Enable efficient portfolio management on both desktop and mobile devices
 - Serve as a learning exercise for modern web technologies (Blazor WASM, Go, Azure, AWS)
 
@@ -44,29 +46,32 @@
 - **Frontend:** Blazor WebAssembly hosted on AWS S3 + CloudFront
 - **Backend:** Azure Functions (Go runtime)
 - **Database:** Azure Cosmos DB (NoSQL)
-- **Authentication:** JWT-based authentication
-- **External APIs:** Google Finance API for stock prices, ExchangeRate-API for currency conversion
+- **Authentication:** JWT-based authentication with role-based access control
+- **External APIs:** Google Finance API for stock prices and currency conversion
 
 ---
 
 ## Product Vision & Goals
 
 ### Product Vision
-Prosperity is a **personal learning project** designed to modernize and simplify portfolio management by replacing manual Excel tracking with an automated, real-time web application. The focus is on functionality, ease of use, and exposure to modern cloud technologies.
+Prosperity is a **multi-user portfolio management application** designed to modernize and simplify portfolio management by replacing manual Excel tracking with an automated, real-time web application. The focus is on functionality, ease of use, role-based access control, and exposure to modern cloud technologies.
 
 ### Primary Goals
 1. **Functional Parity:** Replicate all capabilities of the current Excel-based system
-2. **Efficiency:** Reduce time spent on portfolio tracking and manual data entry
-3. **Automation:** Eliminate manual price lookups and calculation errors
-4. **Learning:** Gain hands-on experience with Blazor WASM, Go, Azure, and hybrid cloud architecture
-5. **Accessibility:** Enable portfolio management from any device (desktop primary, mobile secondary)
+2. **Multi-User Support:** Enable multiple users with appropriate role-based permissions
+3. **Efficiency:** Reduce time spent on portfolio tracking and manual data entry
+4. **Automation:** Eliminate manual price lookups and calculation errors
+5. **Learning:** Gain hands-on experience with Blazor WASM, Go, Azure, and hybrid cloud architecture
+6. **Accessibility:** Enable portfolio management from any device (desktop primary, mobile secondary)
 
 ### Non-Goals
-- Commercial product development or multi-user SaaS platform
+- Commercial product development or public SaaS platform
 - Automated broker integration or trading capabilities
-- Social features or portfolio sharing
+- Social features or portfolio sharing beyond defined user roles
 - Advanced financial modeling or investment advice
 - Mobile native applications (web-only responsive design)
+- Separate dividend tracking (managed via cash balance updates)
+- Historical price caching or storage
 
 ---
 
@@ -77,17 +82,18 @@ The MVP will be considered successful if it meets the following criteria:
 ### Functional Success Metrics
 - ✅ Replicates 100% of current Excel functionality
 - ✅ Supports all 5 existing accounts (ZA, TFSA, US, EUR, Prop)
+- ✅ Supports multi-user access with role-based permissions
 - ✅ Provides real-time price updates for all 54+ stocks
-- ✅ Calculates profit/loss automatically and accurately
-- ✅ Handles multi-currency conversions (USD, EUR, GBP to ZAR)
+- ✅ Calculates profit/loss automatically and accurately including transaction costs
+- ✅ Handles multi-currency conversions (USD, EUR, GBP to ZAR) in real-time
 - ✅ Displays summary dashboard with all key metrics
-- ✅ Enables full CRUD operations for holdings, deposits, and transfers
+- ✅ Enables full CRUD operations for holdings, deposits, withdrawals, and transfers
 
 ### Performance Success Metrics
 - ⚡ Faster than current Excel workflow (less time from open to insight)
 - ⚡ Easier to use than Excel (fewer clicks, less manual entry)
 - ⚡ Page loads in < 3 seconds (desktop)
-- ⚡ Price refresh completes in < 10 seconds for all holdings
+- ⚡ Price refresh retrieves real-time data on-demand (no caching delays)
 
 ### Quality Success Metrics
 - 🔒 Data security maintained (authentication, encryption)
@@ -110,6 +116,7 @@ The MVP will be considered successful if it meets the following criteria:
 - Currently tracks ~54 holdings manually in Excel
 - Invests in South African (JSE), US (NYSE/NASDAQ), and European stocks
 - Requires daily access to portfolio performance data
+- May grant access to financial advisors or family members (Viewer role)
 - Values efficiency, accuracy, and data control
 - Comfortable with web applications and modern UX patterns
 
@@ -138,26 +145,28 @@ The MVP will be considered successful if it meets the following criteria:
 #### Core Pages
 1. **Summary Dashboard** - Portfolio overview across all accounts
 2. **Investments Page** - Detailed holdings management with expandable accounts
-3. **Deposits & Transfers Page** - Transaction history and cash flow tracking
-4. **Settings Page** - Application configuration and customization
-5. **Admin Panel** - User management and system administration (Admin role only)
+3. **Deposits, Withdrawals & Transfers Page** - Transaction history and cash flow tracking
+4. **Annualised Returns Report** - Track deposits and portfolio growth over time
+5. **Settings Page** - Application configuration and customization
+6. **Admin Panel** - User management and role assignment (Admin role only)
 
 #### Core Features
-- Manual stock entry (ticker, quantity, price, date)
-- Real-time price updates via Google Finance API
+- Manual stock entry (ticker, quantity, price, date, costs/fees)
+- Real-time price updates via Google Finance API (on-demand, no caching)
+- Real-time currency conversion via Google Finance API
 - Multi-account organization (5 accounts: ZA, TFSA, US, EUR, Prop)
 - Multi-currency support (USD, EUR, GBP, ZAR)
-- Automatic profit/loss calculations
+- Automatic profit/loss calculations including transaction costs
 - Cash balance tracking per account
 - Deposit recording (capital additions to accounts)
+- Withdrawal recording (capital removals from accounts)
 - Transfer tracking (money movement between accounts)
-- Average cost basis calculation for multiple purchases of same stock
+- Transaction cost/fee tracking for accurate profit calculations
 - Responsive design (desktop and mobile)
 - Light/Dark theme support
 - User authentication (email/password)
 - **Role-based access control** (Admin, Owner, Viewer)
 - **User management admin panel**
-- **Audit trail logging**
 - Bulk data import/export (CSV format)
 - Customizable dropdown options (exchange, industry, type, action, currency)
 
@@ -165,18 +174,20 @@ The MVP will be considered successful if it meets the following criteria:
 
 #### Deferred to Post-MVP or Future
 - Advanced charting and visualizations (beyond basic P/L display)
-- Dividend tracking beyond account cash balance updates
+- Separate dividend tracking (dividends managed via cash balance)
 - Price alerts and notifications
 - Historical performance charts and trend analysis
 - Tax reporting and SARS integration
-- Automated dividend capture from external sources
 - Portfolio optimization and rebalancing suggestions
 - Broker API integration for automatic trade imports
 - Two-factor authentication (2FA)
 - Advanced filtering and search beyond basic account/ticker lookup
 - Mobile native applications
 - Offline mode / PWA capabilities
-- Social sharing or multi-user features
+- Social sharing or public portfolio features
+- Audit trail logging
+- Price or exchange rate caching
+- Average cost basis automatic calculation (user-managed)
 
 ---
 
@@ -306,7 +317,14 @@ Investments Page
 4. **Type** - Investment classification (Investment, Speculation, Undervalued, Growth, etc.) - dropdown configurable in Settings
 5. **Action** - Current recommendation (Hold, Buy, Sell, Watch) - dropdown configurable in Settings
 6. **Quantity** - Number of shares owned
-7. **Purchase Price** - Average cost per share (calculated for multiple purchases)
+7. **Average Cost** - Average cost per share (user-maintained, not auto-calculated)
+8. **Total Invested** - Total capital invested (Quantity × Average Cost + cumulative fees)
+9. **Current Price** - Real-time market price (from Google Finance API)
+10. **Current Value** - Quantity × Current Price
+11. **Profit/Loss (Amount)** - Current Value - Total Invested
+12. **Profit/Loss (%)** - ((Current Value - Total Invested) / Total Invested) × 100
+13. **Currency** - Original currency of stock (USD, EUR, ZAR, GBP) - dropdown configurable in Settings
+14. **Actions** - Edit and Delete buttons
 8. **Total Invested** - Total capital invested (Quantity × Purchase Price)
 9. **Current Price** - Real-time market price (from Google Finance API)
 10. **Current Value** - Quantity × Current Price
@@ -320,12 +338,12 @@ Investments Page
 - Profit/loss color-coded (green positive, red negative)
 - Sortable columns (by ticker, value, P/L, etc.)
 - Responsive table layout (stacks on mobile)
-- Current price updates on page load and manual refresh
+- Current price fetched on-demand from Google Finance API (no caching)
 
 **Acceptance Criteria:**
 - [ ] All holdings displayed with complete data
 - [ ] Current prices fetch successfully from Google Finance API
-- [ ] Profit/loss calculations are accurate
+- [ ] Profit/loss calculations are accurate including fees
 - [ ] Color coding applied correctly
 - [ ] Table is sortable by all numeric columns
 - [ ] Responsive design works on mobile screens
@@ -341,61 +359,87 @@ Investments Page
 5. **Type** - Dropdown (values from Settings - customizable)
 6. **Action** - Dropdown (values from Settings - customizable)
 7. **Quantity** - Numeric input (decimal allowed for fractional shares)
-8. **Purchase Price** - Numeric input (decimal, 2+ places)
-9. **Purchase Date** - Date picker
-10. **Currency** - Dropdown (values from Settings - customizable)
+8. **Purchase Price** - Numeric input (decimal, 2+ places, price per share)
+9. **Transaction Cost/Fee** - Numeric input (decimal, optional, default: 0)
+10. **Purchase Date** - Date picker
+11. **Currency** - Dropdown (values from Settings - customizable)
 
 **Behavior:**
 - Form accessible via "Add Holding" button on Investments page
-- All fields required except Action (optional)
+- All fields required except Action and Transaction Cost (optional)
 - Validate ticker symbol format (1-5 uppercase characters)
 - Validate numeric inputs (positive numbers only)
 - Fetch current price on form submission to populate initial current value
-- Calculate Total Invested automatically (Quantity × Purchase Price)
+- Calculate Total Cost automatically:
+  - `Total Cost = (Quantity × Purchase Price) + Transaction Cost`
+- Deduct Total Cost from account cash balance (if sufficient funds)
 
 **On Submit:**
 1. Validate all inputs
 2. Fetch current price from Google Finance API
-3. Calculate initial P/L (likely $0 if purchased today)
-4. Save holding to database
-5. Update account totals
-6. Refresh Investments page to show new holding
-7. Display success message
+3. Calculate Total Cost: `(Quantity × Purchase Price) + Transaction Cost`
+4. Calculate Total Invested: Same as Total Cost
+5. Calculate initial P/L based on current price
+6. Check if sufficient cash balance exists (warn but don't block)
+7. Deduct Total Cost from account cash balance
+8. Save holding to database
+9. Update account totals
+10. Refresh Investments page to show new holding
+11. Display success message
 
 **Acceptance Criteria:**
 - [ ] Form accessible from Investments page
 - [ ] All required fields validated before submission
 - [ ] Ticker symbol validated for proper format
+- [ ] Transaction cost field optional (defaults to 0)
+- [ ] Total cost calculated correctly including fees
 - [ ] Current price fetched successfully on submission
+- [ ] Cash balance deducted automatically
+- [ ] Warning displayed if insufficient cash (not enforced)
 - [ ] New holding appears immediately in holdings table
 - [ ] Account totals update correctly
 - [ ] Error messages display for invalid inputs
 
 #### FR-2.4: Edit Existing Holding
-**Description:** Modify details of an existing stock holding.
+**Description:** Modify details of an existing stock holding, including selling (partial or full).
 
 **Behavior:**
 - Edit button in holdings table opens edit form
 - Pre-populate form with current holding data
-- Allow updates to all fields except original purchase date (optional restriction)
-- **Multiple Purchases Handling:** If user purchases more of the same stock:
-  - **Average Cost Basis:** Recalculate average purchase price
-  - Formula: `New Avg Price = ((Existing Quantity × Existing Price) + (New Quantity × New Price)) / (Existing Quantity + New Quantity)`
-  - Update Total Invested accordingly
-  - Maintain single holding row (do NOT create duplicate entries)
+- Allow updates to all fields
+- **For Additional Purchases:** User can enter additional quantity purchased at a new price
+  - Add new purchase as a separate transaction (do not average)
+  - Or user manually updates average cost field
+- **For Sales (Quantity Reduction):**
+  - Reduce quantity
+  - Enter sale price per share
+  - Enter transaction cost/fee (optional)
+  - Calculate proceeds: `(Quantity Sold × Sale Price) - Transaction Cost`
+  - Add proceeds to account cash balance
+  - Update or remove holding based on remaining quantity
 
 **On Submit:**
 1. Validate inputs
-2. If quantity or price changed, recalculate averages
-3. Fetch latest current price
-4. Recalculate P/L
-5. Update database
-6. Refresh holdings table
-7. Display success message
+2. Fetch latest current price from Google Finance API
+3. If quantity reduced (sale):
+   - Calculate sale proceeds
+   - Add proceeds to cash balance
+   - Remove holding if quantity = 0
+4. If quantity increased (purchase):
+   - User manually inputs new average cost
+   - Calculate new total invested
+   - Deduct additional cost from cash balance
+5. Recalculate P/L
+6. Update database
+7. Refresh holdings table
+8. Display success message
 
 **Acceptance Criteria:**
 - [ ] Edit form pre-populated with existing data
-- [ ] Average cost basis calculated correctly for additional purchases
+- [ ] Average cost is user-input field (not auto-calculated)
+- [ ] Sales add proceeds to cash balance correctly
+- [ ] Purchases deduct costs from cash balance correctly
+- [ ] Holdings with quantity = 0 are removed
 - [ ] Updated holding displays immediately
 - [ ] Account totals recalculated
 - [ ] Error handling for invalid inputs
@@ -419,7 +463,7 @@ Investments Page
 - [ ] Success message displayed
 
 #### FR-2.6: Price Refresh
-**Description:** Manually refresh stock prices for all holdings.
+**Description:** Manually refresh stock prices for all holdings by querying Google Finance API.
 
 **Behavior:**
 - "Refresh Prices" button visible on Investments page
@@ -437,6 +481,26 @@ Investments Page
 - If Google Finance API fails for a specific stock:
   - Display error icon next to that stock's price
   - Show tooltip: "Unable to fetch price for [TICKER]"
+  - Do NOT update that stock's price (keep previous value if exists)
+  - Continue updating other stocks
+- If API completely unavailable:
+  - Display global error message: "Unable to refresh prices. Please try again later."
+  - Keep all previous prices
+
+**No Price Caching:**
+- Prices are queried in real-time on each refresh
+- No caching mechanism implemented
+- Every refresh is a fresh API call to Google Finance
+
+**Acceptance Criteria:**
+- [ ] Refresh button accessible and functional
+- [ ] Loading indicator displays during fetch
+- [ ] All stock prices update successfully
+- [ ] Current values and P/L recalculated
+- [ ] Timestamp updates after refresh
+- [ ] Error handling graceful for API failures
+- [ ] Partial failures don't block other price updates
+- [ ] No caching - always fresh data
   - Do NOT update that stock's price (keep previous value)
   - Continue updating other stocks
 - If API completely unavailable:
@@ -454,17 +518,17 @@ Investments Page
 
 ---
 
-### FR-3: Deposits & Transfers Page
+### FR-3: Deposits, Withdrawals & Transfers Page
 
-**Purpose:** Track capital deposits into accounts and transfers between accounts to maintain accurate portfolio funding history and available cash balances.
+**Purpose:** Track capital deposits into accounts, withdrawals from accounts, and transfers between accounts to maintain accurate portfolio funding history and available cash balances.
 
-#### FR-3.1: Deposits & Transfers Table
-**Description:** Display all deposit and transfer transactions in chronological order.
+#### FR-3.1: Deposits, Withdrawals & Transfers Table
+**Description:** Display all deposit, withdrawal, and transfer transactions in chronological order.
 
 **Required Columns:**
 1. **Date** - Transaction date
-2. **Type** - "Deposit" or "Transfer"
-3. **Account** - Source account (for Deposits and Transfers Out) or Destination account (for Transfers In)
+2. **Type** - "Deposit", "Withdrawal", or "Transfer"
+3. **Account** - Source/destination account
 4. **From Account** - Source account (for Transfers only)
 5. **To Account** - Destination account (for Transfers only)
 6. **Amount** - Transaction amount (always positive value)
@@ -474,21 +538,22 @@ Investments Page
 
 **Display Requirements:**
 - Sorted by date (most recent first by default)
-- Deposits shown with single account
-- Transfers shown with From → To account flow
-- Color coding: Deposits (blue), Transfers (orange)
+- Deposits shown with single account (green indicator)
+- Withdrawals shown with single account (red indicator)
+- Transfers shown with From → To account flow (orange indicator)
 - Currency displayed with amount
 - Responsive table (stacks on mobile)
 
 **Calculated Totals (displayed above or below table):**
 - Total Deposits (all accounts)
+- Total Withdrawals (all accounts)
 - Total Transfers (net should be $0 across all accounts)
-- Net Cash Flow by Account
+- Net Capital Contributed by Account: (Deposits - Withdrawals + Transfers In - Transfers Out)
 
 **Acceptance Criteria:**
-- [ ] All deposits and transfers displayed
+- [ ] All deposits, withdrawals, and transfers displayed
 - [ ] Sorted chronologically (newest first)
-- [ ] Type clearly distinguished (Deposit vs Transfer)
+- [ ] Type clearly distinguished (Deposit vs Withdrawal vs Transfer)
 - [ ] Transfer flow (From → To) clearly visible
 - [ ] Totals calculated correctly
 - [ ] Responsive design on mobile
@@ -508,26 +573,59 @@ Investments Page
 - Validate amount > 0
 - On submit:
   1. Save deposit to database
-  2. **Increase account's Deposited Total by amount**
-  3. **Increase account's Cash Balance by amount**
-  4. Refresh Deposits & Transfers table
-  5. Update Summary Dashboard totals
-  6. Display success message
+  2. **Increase account's Cash Balance by amount**
+  3. Refresh Deposits, Withdrawals & Transfers table
+  4. Update Summary Dashboard totals
+  5. Display success message
 
 **Impact on Account:**
-- `Account.Deposited += Deposit.Amount`
 - `Account.CashBalance += Deposit.Amount`
 
+**Total Deposited Calculation:**
+For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Transfers In) - Sum(Transfers Out)`
+
 **Acceptance Criteria:**
-- [ ] Form accessible from Deposits & Transfers page
+- [ ] Form accessible from Deposits, Withdrawals & Transfers page
 - [ ] All fields validated
 - [ ] Deposit saved to database
-- [ ] Account deposited total increases correctly
 - [ ] Account cash balance increases correctly
 - [ ] Dashboard reflects updated totals
 - [ ] Success message displayed
 
-#### FR-3.3: Add Transfer
+#### FR-3.3: Add Withdrawal
+**Description:** Record a capital withdrawal from a specific account.
+
+**Required Form Fields:**
+1. **Date** - Date picker (default: today)
+2. **Account** - Dropdown (ZA, TFSA, US, EUR, Prop)
+3. **Amount** - Numeric input (positive only)
+4. **Currency** - Dropdown (values from Settings)
+5. **Description** - Text input (optional)
+
+**Behavior:**
+- "Add Withdrawal" button opens form
+- Validate amount > 0
+- Validate sufficient cash balance (optional warning, not enforced)
+- On submit:
+  1. Save withdrawal to database
+  2. **Decrease account's Cash Balance by amount**
+  3. Refresh Deposits, Withdrawals & Transfers table
+  4. Update Summary Dashboard totals
+  5. Display success message
+
+**Impact on Account:**
+- `Account.CashBalance -= Withdrawal.Amount`
+
+**Acceptance Criteria:**
+- [ ] Form accessible from Deposits, Withdrawals & Transfers page
+- [ ] All fields validated
+- [ ] Withdrawal saved to database
+- [ ] Account cash balance decreases correctly
+- [ ] Dashboard reflects updated totals
+- [ ] Warning displayed if insufficient balance (not enforced)
+- [ ] Success message displayed
+
+#### FR-3.4: Add Transfer
 **Description:** Record a transfer of funds from one account to another.
 
 **Required Form Fields:**
@@ -544,39 +642,33 @@ Investments Page
 - Validate From Account ≠ To Account
 - On submit:
   1. Save transfer to database
-  2. **Decrease From Account's Deposited Total by amount**
-  3. **Decrease From Account's Cash Balance by amount**
-  4. **Increase To Account's Deposited Total by amount**
-  5. **Increase To Account's Cash Balance by amount**
-  6. Refresh Deposits & Transfers table
-  7. Update Summary Dashboard
-  8. Display success message
+  2. **Decrease From Account's Cash Balance by amount**
+  3. **Increase To Account's Cash Balance by amount**
+  4. Refresh Deposits, Withdrawals & Transfers table
+  5. Update Summary Dashboard
+  6. Display success message
 
 **Impact on Accounts:**
-- From Account:
-  - `FromAccount.Deposited -= Transfer.Amount`
-  - `FromAccount.CashBalance -= Transfer.Amount`
-- To Account:
-  - `ToAccount.Deposited += Transfer.Amount`
-  - `ToAccount.CashBalance += Transfer.Amount`
+- From Account: `FromAccount.CashBalance -= Transfer.Amount`
+- To Account: `ToAccount.CashBalance += Transfer.Amount`
 
 **Validation:**
 - From Account must have sufficient cash balance (CashBalance >= Transfer.Amount)
 - Display error if insufficient funds: "Insufficient cash balance in [From Account]. Available: [CashBalance]"
 
 **Acceptance Criteria:**
-- [ ] Form accessible from Deposits & Transfers page
+- [ ] Form accessible from Deposits, Withdrawals & Transfers page
 - [ ] From/To accounts must be different
 - [ ] Amount validated against From Account cash balance
 - [ ] Transfer saved to database
-- [ ] From Account deposited and cash decrease correctly
-- [ ] To Account deposited and cash increase correctly
+- [ ] From Account cash decreases correctly
+- [ ] To Account cash increases correctly
 - [ ] Dashboard reflects updated totals
 - [ ] Error message for insufficient funds
 - [ ] Success message displayed
 
-#### FR-3.4: Edit Deposit/Transfer
-**Description:** Modify an existing deposit or transfer transaction.
+#### FR-3.5: Edit Deposit/Withdrawal/Transfer
+**Description:** Modify an existing deposit, withdrawal, or transfer transaction.
 
 **Behavior:**
 - Edit button opens pre-populated form
@@ -595,8 +687,8 @@ Investments Page
 - [ ] Cash balances updated accurately
 - [ ] Success message displayed
 
-#### FR-3.5: Delete Deposit/Transfer
-**Description:** Remove a deposit or transfer transaction.
+#### FR-3.6: Delete Deposit/Withdrawal/Transfer
+**Description:** Remove a deposit, withdrawal, or transfer transaction.
 
 **Behavior:**
 - Delete button with confirmation dialog
@@ -607,30 +699,34 @@ Investments Page
   4. Display success message
 
 **Impact on Accounts:**
-- Deposit deletion: Decrease Deposited Total and Cash Balance
+- Deposit deletion: Decrease Cash Balance
+- Withdrawal deletion: Increase Cash Balance
 - Transfer deletion: Reverse both From and To account impacts
 
 **Acceptance Criteria:**
 - [ ] Confirmation dialog prevents accidental deletion
 - [ ] Transaction removed from database
-- [ ] Account totals and cash balances reversed correctly
+- [ ] Account cash balances reversed correctly
 - [ ] Dashboard updated
 - [ ] Success message displayed
 
-#### FR-3.6: Transfers History View
-**Description:** Separate view to filter and display only transfers between accounts.
+#### FR-3.7: Transaction Filters
+**Description:** Filter view to show specific transaction types.
 
 **Behavior:**
-- Toggle or tab to switch between "All Transactions" and "Transfers Only"
-- Transfers view shows only transfers (excludes deposits)
-- Displays From → To flow clearly
-- Shows net impact per account
+- Toggle or tabs to switch between:
+  - All Transactions
+  - Deposits Only
+  - Withdrawals Only
+  - Transfers Only
+- Filtered view updates table display
+- Totals recalculate based on filter
 
 **Acceptance Criteria:**
-- [ ] Toggle accessible on Deposits & Transfers page
-- [ ] Transfers view filters correctly
-- [ ] Transfer flow clearly visible
-- [ ] Net transfer impact calculated per account
+- [ ] Filters accessible on Deposits, Withdrawals & Transfers page
+- [ ] Each filter displays correct transactions
+- [ ] Totals update based on selected filter
+- [ ] Transfer flow clearly visible in Transfers view
 
 ---
 
@@ -1019,32 +1115,36 @@ Investments Page
 - [ ] Admin can access all data
 - [ ] Users cannot access others' data
 
-#### FR-7.4: Audit Trail
-**Description:** Track user actions for security and compliance.
+#### FR-7.4: Authorization & Data Isolation
+**Description:** Implement role-based authorization at API level and ensure proper data isolation.
 
-**Logged Actions:**
-- User login/logout
-- Failed login attempts
-- User creation/modification/deletion
-- Role changes
-- Portfolio data changes (create, update, delete)
-- Settings modifications
-- Data import/export operations
+**Backend Enforcement:**
+- All API endpoints validate user role from JWT token
+- Role-required endpoints return 403 Forbidden if user lacks permission
+- All database queries scoped by userId (for Owner/Viewer) or unrestricted (for Admin)
+- Admin role bypasses userId filtering for management purposes
 
-**Log Information:**
-- Timestamp
-- User ID and email
-- Action type
-- Resource affected (holding, account, etc.)
-- IP address
-- Result (success/failure)
+**Frontend Enforcement:**
+- UI elements hidden/disabled based on role
+- Menu items filtered by role
+- Buttons (Add, Edit, Delete) hidden for Viewer role
+- Admin panel visible only to Admin role
+- Redirect to appropriate page if accessing unauthorized route
+
+**Data Isolation:**
+- Owner users see only their own data
+- Viewer users see only portfolios they're granted access to
+- Admin users can view/manage all data
+- All database queries include userId filter (except for Admin)
 
 **Acceptance Criteria:**
-- [ ] All user actions logged to database
-- [ ] Logs include timestamp, user, action, resource
-- [ ] Admin can view audit logs
-- [ ] Logs retained for compliance period
-- [ ] Failed login attempts tracked
+- [ ] JWT includes userId and role claims
+- [ ] API validates role on every request
+- [ ] Unauthorized requests return 403
+- [ ] UI elements hidden based on permissions
+- [ ] Data queries properly scoped by user
+- [ ] Admin can access all data
+- [ ] Users cannot access others' data
 
 ---
 
@@ -1376,7 +1476,6 @@ Investments Page
 - `description` (optional)
 - `currency` (default currency for account, e.g., "ZAR")
 - `cashBalance` (decimal, current uninvested cash)
-- `deposited` (decimal, total capital deposited)
 - `createdAt` (timestamp)
 - `updatedAt` (timestamp)
 
@@ -1390,8 +1489,8 @@ Investments Page
 - `type` (e.g., "Investment", "Speculation")
 - `action` (e.g., "Hold", "Buy", "Sell")
 - `quantity` (decimal, shares owned)
-- `purchasePrice` (decimal, average cost per share)
-- `totalInvested` (decimal, quantity × purchasePrice)
+- `averageCost` (decimal, user-maintained average cost per share)
+- `totalInvested` (decimal, total capital invested including fees)
 - `currentPrice` (decimal, latest market price)
 - `currentValue` (decimal, quantity × currentPrice)
 - `profitLoss` (decimal, currentValue - totalInvested)
@@ -1401,30 +1500,18 @@ Investments Page
 - `createdAt` (timestamp)
 - `updatedAt` (timestamp)
 
-**Transaction** (Deposits & Transfers)
+**Transaction** (Deposits, Withdrawals & Transfers)
 - `id` (UUID)
 - `userId` (foreign key, indexed)
-- `type` ("Deposit" or "Transfer")
+- `type` ("Deposit", "Withdrawal", or "Transfer")
 - `date` (transaction date)
-- `accountId` (for deposits, or "To Account" for transfers)
+- `accountId` (for deposits/withdrawals, or "To Account" for transfers)
 - `fromAccountId` (for transfers only, nullable)
 - `toAccountId` (for transfers only, nullable)
 - `amount` (decimal, always positive)
 - `currency` (e.g., "ZAR", "USD")
 - `description` (optional text)
 - `createdAt` (timestamp)
-
-**AuditLog** (New)
-- `id` (UUID)
-- `userId` (foreign key, indexed)
-- `userEmail` (for reference)
-- `action` (e.g., "USER_LOGIN", "USER_CREATED", "HOLDING_UPDATED", "ROLE_CHANGED")
-- `resourceType` (e.g., "User", "Holding", "Account")
-- `resourceId` (UUID of affected resource, nullable)
-- `ipAddress` (string)
-- `result` (enum: "Success", "Failure")
-- `details` (JSON: additional context)
-- `timestamp` (timestamp, indexed)
 
 **Settings** (User Preferences)
 - Stored in `User.preferences` JSON field or separate Settings table
@@ -1498,29 +1585,30 @@ Investments Page
 
 ### INT-1: Google Finance API
 
-**Purpose:** Fetch real-time stock prices for all holdings.
+**Purpose:** Fetch real-time stock prices and currency exchange rates for all holdings.
 
 **API Details:**
-- **Endpoint:** Google Finance API (or equivalent - e.g., Yahoo Finance, Alpha Vantage)
-- **Rate Limits:** Check API documentation (Google Finance typically allows reasonable usage)
+- **Endpoint:** Google Finance API (or equivalent - e.g., Yahoo Finance, Alpha Vantage if Google Finance unavailable)
+- **Rate Limits:** Dependent on API provider - no local caching to manage limits
 - **Authentication:** API key (if required)
 
 **Usage:**
 - Fetch price by ticker symbol and exchange
+- Fetch currency exchange rates (USD/ZAR, EUR/ZAR, GBP/ZAR)
 - Example: `AAPL` on `NASDAQ`, `ANH` on `JSE`
-- Parse response for current price
+- Parse response for current price and exchange rates
 - Handle errors gracefully (stock not found, API unavailable)
 
-**Caching Strategy:**
-- Cache prices for 15 minutes
-- Reduce redundant API calls
-- Update cache on manual refresh
+**No Caching Strategy:**
+- All prices and exchange rates fetched in real-time
+- Every request is a fresh API call
+- No local storage of historical prices or rates
 
 **Error Handling:**
 - If API fails for a specific stock:
   - Log error
   - Display error icon next to stock
-  - Keep previous price
+  - Keep previous price if exists
   - Continue fetching other stocks
 - If API completely unavailable:
   - Display global error message
@@ -1529,38 +1617,16 @@ Investments Page
 
 **Acceptance Criteria:**
 - [ ] Prices fetched successfully for all supported exchanges
+- [ ] Exchange rates fetched successfully
 - [ ] Errors handled gracefully
-- [ ] Caching reduces API calls
-- [ ] Manual refresh bypasses cache
+- [ ] No caching - always real-time data
+- [ ] Manual refresh re-queries API
 
 ---
 
-### INT-2: ExchangeRate-API (Currency Conversion)
+### INT-2: No Additional External APIs Required
 
-**Purpose:** Fetch current exchange rates for multi-currency portfolio calculations.
-
-**API Details:**
-- **Endpoint:** ExchangeRate-API.com or European Central Bank API
-- **Rate Limits:** 1,500 requests/month (free tier)
-- **Authentication:** API key (if required)
-
-**Usage:**
-- Fetch exchange rates relative to ZAR (base currency)
-- Example: USD/ZAR, EUR/ZAR, GBP/ZAR
-- Cache rates for 24 hours (exchange rates change daily)
-- Update on manual refresh or daily
-
-**Error Handling:**
-- If API fails:
-  - Use cached rates (with warning)
-  - Display message: "Using exchange rates from [date]"
-  - Allow manual entry of rates (Settings option - future enhancement)
-
-**Acceptance Criteria:**
-- [ ] Exchange rates fetched successfully
-- [ ] Rates cached for 24 hours
-- [ ] Errors handled with fallback to cached rates
-- [ ] Currency conversions accurate
+All stock prices and currency conversion handled through Google Finance API. No separate ExchangeRate API needed.
 
 ---
 

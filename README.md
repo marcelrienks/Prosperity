@@ -63,8 +63,7 @@ Prosperity uses a **hybrid cloud architecture** combining AWS for static hosting
 - Partitioned by userId
 
 **External APIs**
-- Google Finance API (Stock Prices)
-- ExchangeRate-API (Currency Conversion)
+- Google Finance API (Real-time Stock Prices & Currency Conversion)
 
 **Infrastructure**
 - AWS: S3, CloudFront, Route 53
