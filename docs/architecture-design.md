@@ -557,6 +557,8 @@ func (r *AccountRepository) Update(account *Account) error
 }
 ```
 
+**Note:** The `cashBalance` field remains fully editable at any time to accommodate dividends, interest, fees, corrections, or any manual adjustments needed.
+
 #### Collection: `holdings`
 ```json
 {
@@ -571,18 +573,21 @@ func (r *AccountRepository) Update(account *Account) error
   "action": "Hold",
   "quantity": 10,
   "purchasePrice": 150.00,
+  "transactionFee": 5.00,
   "purchaseDate": "2024-05-15T00:00:00Z",
-  "totalInvested": 1500.00,
+  "totalInvested": 1505.00,
   "currentPrice": 175.50,
   "currentValue": 1755.00,
-  "profitLoss": 255.00,
-  "profitLossPercent": 17.00,
+  "profitLoss": 250.00,
+  "profitLossPercent": 16.61,
   "currency": "USD",
   "lastPriceUpdate": "2025-10-15T10:00:00Z",
   "createdAt": "2024-05-15T10:00:00Z",
   "updatedAt": "2025-10-15T10:00:00Z"
 }
 ```
+
+**Note:** All fields in holdings (quantity, purchasePrice, transactionFee, totalInvested, etc.) remain editable at any time to allow for corrections, additional fees, or manual adjustments.
 
 #### Collection: `transactions`
 ```json
@@ -600,42 +605,7 @@ func (r *AccountRepository) Update(account *Account) error
 }
 ```
 
-#### Collection: `dividends`
-```json
-{
-  "id": "div_001",
-  "userId": "user_123",
-  "dividendId": "div_001",
-  "accountId": "acc_001",
-  "holdingId": "hold_001",
-  "ticker": "AAPL",
-  "amount": 5.20,
-  "currency": "USD",
-  "paymentDate": "2025-08-15T00:00:00Z",
-  "exDividendDate": "2025-07-30T00:00:00Z",
-  "type": "dividend",
-  "createdAt": "2025-08-15T10:00:00Z"
-}
-```
-
-#### Collection: `auditlogs`
-```json
-{
-  "id": "log_001",
-  "userId": "user_123",
-  "userEmail": "user@example.com",
-  "action": "USER_LOGIN",
-  "resourceType": "User",
-  "resourceId": "user_123",
-  "ipAddress": "192.168.1.1",
-  "result": "Success",
-  "details": {
-    "userAgent": "Mozilla/5.0...",
-    "location": "Cape Town, ZA"
-  },
-  "timestamp": "2025-10-15T10:00:00Z"
-}
-```
+**Note:** Transaction amounts and descriptions are optional. Transactions serve as a record but do not automatically enforce cash balance updates unless configured by user preference.
 
 ### Partition Strategy
 
@@ -654,9 +624,10 @@ func (r *AccountRepository) Update(account *Account) error
 - Custom indexes for frequently queried fields:
   - `accountId`
   - `ticker`
-  - `date` (for transactions and dividends)
-  - `timestamp` (for audit logs)
+  - `date` (for transactions)
   - `role` and `status` (for user queries)
+
+**Note:** No audit logging or historical tracking implemented - only current state values are stored and indexed.
 
 ---
 

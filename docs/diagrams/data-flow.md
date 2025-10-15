@@ -1,8 +1,33 @@
 # Prosperity - Data Flow & State Management Diagrams
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Date:** October 15, 2025  
 **Purpose:** Visual representation of data flow patterns and state management
+
+---
+
+## Important: Data Management Philosophy
+
+**Flexible & Editable Approach:**
+
+This system follows a flexible, user-controlled data management approach:
+
+1. **Optional Transaction Fields**: All transaction amounts, fees, and costs are optional inputs. The system calculates with whatever data is provided.
+
+2. **Fully Editable Values**: All holding values (quantity, purchase price, fees, total invested) and account cash balances remain fully editable at any time after creation.
+
+3. **No Audit Trail**: Only current final values are stored. No historical changes or audit logs are maintained.
+
+4. **Manual Adjustments Welcome**: Users can adjust any value at any time for:
+   - Dividends received
+   - Interest earned
+   - Fees discovered later
+   - Manual corrections
+   - Any other reason
+
+5. **Optional Automatic Updates**: Cash balance updates from transactions (deposits, withdrawals, transfers, purchases, sales) are optional and configurable based on user preference.
+
+6. **No Enforcement**: No validation prevents negative balances or insufficient funds. All values are user-manageable.
 
 ---
 
@@ -208,58 +233,70 @@ flowchart TD
 
 ## Cash Balance Management Flow
 
-This diagram shows how cash balances are updated by various operations.
+This diagram shows how cash balances can be updated by various operations. **Important:** All balance updates are optional and configurable. The cash balance field remains fully editable at all times for manual adjustments.
 
 ```mermaid
 flowchart TD
-    Account[(Account<br/>Cash Balance)]
+    Account[(Account<br/>Cash Balance<br/>Fully Editable)]
     
-    Deposit[Deposit Operation] -->|+ Amount| Account
-    TransferIn[Transfer In] -->|+ Amount| Account
-    TransferOut[Transfer Out] -->|-Amount| Account
-    Purchase[Stock Purchase<br/>Optional] -->|-Amount| Account
-    Manual[Manual Adjustment] -->|+/- Amount| Account
+    Deposit[Deposit Operation<br/>Optional Auto-Update] -->|+ Amount| Account
+    TransferIn[Transfer In<br/>Optional Auto-Update] -->|+ Amount| Account
+    TransferOut[Transfer Out<br/>Optional Auto-Update] -->|-Amount| Account
+    Purchase[Stock Purchase<br/>Optional Auto-Update] -->|-Amount| Account
+    Sale[Stock Sale<br/>Optional Auto-Update] -->|+ Amount| Account
+    Manual[Manual Adjustment<br/>Dividends/Interest/Fees] -->|+/- Amount| Account
     
-    Account --> Check{Balance >= 0?}
-    Check -->|Yes| Valid[Valid State]
-    Check -->|No| Error[Show Error<br/>Cannot Transfer/Purchase]
-    
-    Valid --> Display[Display in UI]
+    Account --> Display[Display in UI<br/>Direct Edit Enabled]
     
     style Account fill:#d4edda
     style Deposit fill:#e1f5ff
     style TransferIn fill:#e1f5ff
+    style Sale fill:#e1f5ff
     style Manual fill:#e1f5ff
     style TransferOut fill:#f8d7da
     style Purchase fill:#f8d7da
-    style Error fill:#f8d7da
-    style Valid fill:#d4edda
+    style Display fill:#d4edda
 ```
+
+**Note:** The error checking for balance validation has been removed. Users can adjust balances freely, and all transaction updates to cash balance are optional based on user settings.
 
 ### Cash Balance Formula
 
 ```mermaid
 flowchart LR
-    subgraph Formula["Cash Balance Calculation"]
-        Start[Initial Balance: 0]
+    subgraph Formula["Cash Balance - Flexible Calculation"]
+        Start[Current Cash Balance]
         
-        Start -->|+| Deposits[All Deposits]
-        Deposits -->|+| TransIn[Transfers In]
-        TransIn -->|-| TransOut[Transfers Out]
+        Note1[All Updates Optional<br/>Based on User Settings]
+        
+        Start -->|+| Deposits[Deposits<br/>optional auto-update]
+        Deposits -->|+| TransIn[Transfers In<br/>optional auto-update]
+        TransIn -->|-| TransOut[Transfers Out<br/>optional auto-update]
         TransOut -->|-| Purch[Purchases<br/>if enabled]
-        Purch -->|+/-| Adj[Manual Adjustments]
+        Purch -->|+| Sales[Sales<br/>if enabled]
+        Sales -->|+/-| Adj[Manual Adjustments<br/>Always Available]
         
-        Adj --> Final[Current Cash Balance]
+        Adj --> Final[Current Cash Balance<br/>Fully Editable Anytime]
+        
+        Note1 -.-> Start
     end
     
     style Start fill:#e1f5ff
     style Final fill:#d4edda
     style Deposits fill:#d4edda
     style TransIn fill:#d4edda
-    style Divs fill:#d4edda
+    style Sales fill:#d4edda
     style TransOut fill:#f8d7da
     style Purch fill:#f8d7da
+    style Note1 fill:#fff3cd
 ```
+
+**Key Points:**
+- Cash balance starts at user-defined value (default $0)
+- All transaction-based updates are optional (user configurable)
+- Manual adjustments always available for dividends, interest, fees, or corrections
+- No audit trail maintained - only current value stored
+- Balance can be edited directly at any time without restrictions
 
 ---
 

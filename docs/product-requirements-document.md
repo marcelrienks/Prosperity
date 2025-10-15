@@ -181,6 +181,7 @@ The MVP will be considered successful if it meets the following criteria:
 - Two-factor authentication (2FA)
 - Advanced filtering and search beyond basic account/ticker lookup
 - Mobile native applications
+- Audit trail or change history tracking
 - Offline mode / PWA capabilities
 - Social sharing or public portfolio features
 - Audit trail logging
@@ -370,64 +371,63 @@ Investments Page
 - Fetch current price on form submission to populate initial current value
 - Calculate Total Cost automatically:
   - `Total Cost = (Quantity × Purchase Price) + Transaction Cost`
-- Deduct Total Cost from account cash balance (if sufficient funds)
+- If sufficient cash balance exists, optionally deduct Total Cost from account cash balance (user preference)
+- **Important:** All transaction fields (amounts, fees, costs) are optional inputs. If not provided at transaction time, the system calculates with available data. All holding values and account cash balances remain fully editable after creation to account for any adjustments needed (fees discovered later, dividend payments, interest, manual corrections, etc.). No audit trail is maintained - only the current final values are stored.
 
 **On Submit:**
 1. Validate all inputs
 2. Fetch current price from Google Finance API
-3. Calculate Total Cost: `(Quantity × Purchase Price) + Transaction Cost`
+3. Calculate Total Cost: `(Quantity × Purchase Price) + Transaction Cost` (use 0 if fee not provided)
 4. Calculate Total Invested: Same as Total Cost
 5. Calculate initial P/L based on current price
-6. Check if sufficient cash balance exists (warn but don't block)
-7. Deduct Total Cost from account cash balance
-8. Save holding to database
-9. Update account totals
-10. Refresh Investments page to show new holding
-11. Display success message
+6. Optionally deduct Total Cost from account cash balance (user preference)
+7. Save holding to database with all values editable
+8. Update account totals
+9. Refresh Investments page to show new holding
+10. Display success message
 
 **Acceptance Criteria:**
 - [ ] Form accessible from Investments page
 - [ ] All required fields validated before submission
 - [ ] Ticker symbol validated for proper format
 - [ ] Transaction cost field optional (defaults to 0)
-- [ ] Total cost calculated correctly including fees
+- [ ] Total cost calculated correctly including fees (when provided)
 - [ ] Current price fetched successfully on submission
-- [ ] Cash balance deducted automatically
-- [ ] Warning displayed if insufficient cash (not enforced)
-- [ ] New holding appears immediately in holdings table
+- [ ] Cash balance optionally deducted (based on user settings)
+- [ ] New holding appears immediately in holdings table with all fields editable
 - [ ] Account totals update correctly
 - [ ] Error messages display for invalid inputs
+- [ ] All holding values (quantity, price, fees, total invested) remain editable after creation
 
 #### FR-2.4: Edit Existing Holding
-**Description:** Modify details of an existing stock holding, including selling (partial or full).
+**Description:** Modify details of an existing stock holding, including selling (partial or full). **All fields remain editable at any time** to allow for corrections, fee adjustments, or manual updates.
 
 **Behavior:**
 - Edit button in holdings table opens edit form
 - Pre-populate form with current holding data
-- Allow updates to all fields
-- **For Additional Purchases:** User can enter additional quantity purchased at a new price
-  - Add new purchase as a separate transaction (do not average)
-  - Or user manually updates average cost field
+- **Allow updates to ALL fields** including quantity, purchase price, fees, total invested, and currency
+- **For Additional Purchases:** User manually updates quantity, average cost, and total invested fields to reflect the additional purchase
 - **For Sales (Quantity Reduction):**
   - Reduce quantity
-  - Enter sale price per share
+  - Enter sale price per share (optional)
   - Enter transaction cost/fee (optional)
-  - Calculate proceeds: `(Quantity Sold × Sale Price) - Transaction Cost`
-  - Add proceeds to account cash balance
+  - Optionally calculate proceeds: `(Quantity Sold × Sale Price) - Transaction Cost`
+  - Optionally add proceeds to account cash balance (user preference)
   - Update or remove holding based on remaining quantity
+- **For Manual Adjustments:** User can edit any field directly to correct errors, add fees discovered later, or adjust values for any reason
 
 **On Submit:**
 1. Validate inputs
 2. Fetch latest current price from Google Finance API
 3. If quantity reduced (sale):
-   - Calculate sale proceeds
-   - Add proceeds to cash balance
+   - Optionally calculate sale proceeds (if prices provided)
+   - Optionally add proceeds to cash balance (user preference)
    - Remove holding if quantity = 0
-4. If quantity increased (purchase):
-   - User manually inputs new average cost
-   - Calculate new total invested
-   - Deduct additional cost from cash balance
-5. Recalculate P/L
+4. If quantity increased or values changed:
+   - Save updated values as provided by user
+   - Optionally adjust cash balance (user preference)
+5. Recalculate P/L based on updated values
+6. Save all changes - no historical tracking, only current state stored
 6. Update database
 7. Refresh holdings table
 8. Display success message
@@ -571,13 +571,14 @@ Investments Page
 - Validate amount > 0
 - On submit:
   1. Save deposit to database
-  2. **Increase account's Cash Balance by amount**
+  2. **Optionally increase account's Cash Balance by amount** (automatic or manual - user preference)
   3. Refresh Deposits, Withdrawals & Transfers table
   4. Update Summary Dashboard totals
   5. Display success message
 
 **Impact on Account:**
-- `Account.CashBalance += Deposit.Amount`
+- `Account.CashBalance += Deposit.Amount` (if automatic balance updates enabled)
+- **Note:** Cash balance can always be manually adjusted separately if automatic updates are disabled
 
 **Total Deposited Calculation:**
 For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Transfers In) - Sum(Transfers Out)`
@@ -586,7 +587,8 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 - [ ] Form accessible from Deposits, Withdrawals & Transfers page
 - [ ] All fields validated
 - [ ] Deposit saved to database
-- [ ] Account cash balance increases correctly
+- [ ] Account cash balance optionally increases based on settings
+- [ ] Cash balance remains manually editable at all times
 - [ ] Dashboard reflects updated totals
 - [ ] Success message displayed
 
@@ -603,24 +605,25 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 **Behavior:**
 - "Add Withdrawal" button opens form
 - Validate amount > 0
-- Validate sufficient cash balance (optional warning, not enforced)
+- No enforcement of cash balance sufficiency - values can be edited manually
 - On submit:
   1. Save withdrawal to database
-  2. **Decrease account's Cash Balance by amount**
+  2. **Optionally decrease account's Cash Balance by amount** (automatic or manual - user preference)
   3. Refresh Deposits, Withdrawals & Transfers table
   4. Update Summary Dashboard totals
   5. Display success message
 
 **Impact on Account:**
-- `Account.CashBalance -= Withdrawal.Amount`
+- `Account.CashBalance -= Withdrawal.Amount` (if automatic balance updates enabled)
+- **Note:** Cash balance can always be manually adjusted separately if automatic updates are disabled
 
 **Acceptance Criteria:**
 - [ ] Form accessible from Deposits, Withdrawals & Transfers page
 - [ ] All fields validated
 - [ ] Withdrawal saved to database
-- [ ] Account cash balance decreases correctly
+- [ ] Account cash balance optionally decreases based on settings
+- [ ] Cash balance remains manually editable at all times
 - [ ] Dashboard reflects updated totals
-- [ ] Warning displayed if insufficient balance (not enforced)
 - [ ] Success message displayed
 
 #### FR-3.4: Add Transfer
@@ -640,14 +643,16 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 - Validate From Account ≠ To Account
 - On submit:
   1. Save transfer to database
-  2. **Decrease From Account's Cash Balance by amount**
-  3. **Increase To Account's Cash Balance by amount**
+  2. **Optionally decrease From Account's Cash Balance by amount** (automatic or manual - user preference)
+  3. **Optionally increase To Account's Cash Balance by amount** (automatic or manual - user preference)
   4. Refresh Deposits, Withdrawals & Transfers table
   5. Update Summary Dashboard
   6. Display success message
 
 **Impact on Accounts:**
-- From Account: `FromAccount.CashBalance -= Transfer.Amount`
+- From Account: `FromAccount.CashBalance -= Transfer.Amount` (if automatic balance updates enabled)
+- To Account: `ToAccount.CashBalance += Transfer.Amount` (if automatic balance updates enabled)
+- **Note:** Cash balances can always be manually adjusted separately if automatic updates are disabled
 - To Account: `ToAccount.CashBalance += Transfer.Amount`
 
 **Validation:**
@@ -730,52 +735,62 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 
 ### FR-4: Cash Balance Management
 
-**Purpose:** Maintain accurate available cash balance per account, updated by deposits, transfers, and stock purchases.
+**Purpose:** Maintain accurate available cash balance per account. Cash balances are calculated at transaction time (optionally) but remain fully editable to account for any adjustments needed.
 
 #### FR-4.1: Cash Balance Tracking
-**Description:** Each account maintains a cash balance representing uninvested funds.
+**Description:** Each account maintains a cash balance representing uninvested funds. This balance can be updated automatically at transaction time (user preference) or manually adjusted at any time.
+
+**Cash Balance Philosophy:**
+- **Flexible Calculation:** Transactions (deposits, withdrawals, transfers, purchases, sales) can optionally update cash balance automatically, or balances can be managed entirely manually
+- **No Required Fields:** Transaction amounts, fees, and costs are optional - system calculates with available data
+- **Fully Editable:** All holding values and cash balances remain editable after creation
+- **No Audit Trail:** Only current final values are stored, not historical changes
+- **Manual Adjustments Welcome:** Users can adjust cash balance anytime for dividends, interest, fees, or corrections
 
 **Cash Balance Rules:**
 - **Initial State:** Cash Balance = $0 (unless migrated from existing data)
-- **Deposits:** Cash Balance += Deposit Amount
-- **Transfers In:** Cash Balance += Transfer Amount
-- **Transfers Out:** Cash Balance -= Transfer Amount
-- **Stock Purchases:** When adding or editing a holding with increased investment, optionally decrease Cash Balance by the additional investment (user preference in Settings)
-- **Manual Adjustments:** Cash Balance can be adjusted manually for any reason (interest, corrections, etc.)
+- **Deposits:** Cash Balance += Deposit Amount (optional automatic update)
+- **Withdrawals:** Cash Balance -= Withdrawal Amount (optional automatic update)
+- **Transfers In:** Cash Balance += Transfer Amount (optional automatic update)
+- **Transfers Out:** Cash Balance -= Transfer Amount (optional automatic update)
+- **Stock Purchases:** Optionally decrease Cash Balance by purchase amount (user preference)
+- **Stock Sales:** Optionally increase Cash Balance by sale proceeds (user preference)
+- **Manual Adjustments:** Cash Balance can be adjusted manually for any reason (dividends, interest, fees, corrections, etc.)
 
 **Display Requirements:**
 - Cash balance displayed on Summary Dashboard per account
 - Cash balance displayed in Investments page account summary
-- Cash balance editable directly (manual adjustment with description)
+- Cash balance directly editable at any time (manual adjustment)
+- Edit functionality clearly visible and accessible
 
 **Acceptance Criteria:**
 - [ ] Cash balance starts at $0 for new accounts
-- [ ] Deposits increase cash balance correctly
-- [ ] Transfers update both accounts correctly
-- [ ] Stock purchases optionally decrease cash balance
+- [ ] Transactions can optionally update cash balance automatically (user setting)
 - [ ] Cash balance visible on Dashboard and Investments page
-- [ ] Manual adjustments allowed with audit trail
+- [ ] Manual adjustments allowed at any time without description requirement
+- [ ] All values remain editable - no fields are locked or read-only
+- [ ] No audit trail or history tracking implemented
 
 #### FR-4.2: Manual Cash Adjustment
-**Description:** Allow direct adjustment of cash balance for interest, corrections, or other manual updates.
+**Description:** Allow direct adjustment of cash balance for dividends, interest, fees, corrections, or any other reason. No description or justification required.
 
 **Behavior:**
-- "Adjust Cash" button on account summary
+- "Edit Cash Balance" or direct inline edit on account summary
 - Form fields:
-  - Account
-  - Adjustment Amount (positive or negative)
-  - Description/Reason
-  - Date
+  - Account (pre-selected if editing from account view)
+  - New Cash Balance Amount
+  - OR Adjustment Amount (positive or negative delta)
 - On submit:
-  - Update Cash Balance
-  - Log adjustment in transaction history
+  - Update Cash Balance to new value
   - Display success message
+- **No logging or audit trail required** - simple value update
 
 **Acceptance Criteria:**
-- [ ] Manual adjustment form accessible
-- [ ] Cash balance updates correctly
-- [ ] Adjustment logged with description
-- [ ] Visible in transaction history
+- [ ] Manual adjustment accessible from Dashboard and Investments page
+- [ ] Cash balance updates immediately
+- [ ] No description or reason field required
+- [ ] No audit trail or history maintained
+- [ ] Changes reflected immediately across all views
 
 ---
 

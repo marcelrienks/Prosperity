@@ -18,6 +18,7 @@ This repository contains comprehensive documentation for the Prosperity personal
 ```
 docs/
 ├── README.md (this file)
+├── DATA_MANAGEMENT_PHILOSOPHY.md ⭐ NEW
 ├── product-requirements-document.md
 ├── architecture-design.md
 ├── stakeholder-requirements.md
@@ -34,7 +35,25 @@ docs/
 
 ## 📖 Document Overview
 
-### 1. Product Requirements Document (PRD)
+### 1. Data Management Philosophy ⭐ NEW
+**File:** [DATA_MANAGEMENT_PHILOSOPHY.md](DATA_MANAGEMENT_PHILOSOPHY.md)  
+**Status:** ✅ Complete  
+**Purpose:** Core principles for transaction and balance management
+
+**Contains:**
+- Flexible & Editable Approach
+- Optional Transaction Fields Philosophy
+- No Audit Trail Rationale
+- User-Controlled Automation
+- Complete Editability Requirements
+- Manual Adjustment Guidelines
+- Implementation Examples
+
+**Best for:** Understanding how the system handles data entry, editing, cash balances, and why certain architectural decisions were made
+
+---
+
+### 2. Product Requirements Document (PRD)
 **File:** [product-requirements-document.md](product-requirements-document.md)  
 **Status:** ✅ Complete  
 **Purpose:** Comprehensive product requirements specification
@@ -65,7 +84,7 @@ docs/
 
 ---
 
-### 2. Architecture Design Document
+### 3. Architecture Design Document
 **File:** [architecture-design.md](architecture-design.md)  
 **Status:** ✅ Approved  
 **Purpose:** Technical architecture and system design
@@ -96,7 +115,7 @@ docs/
 
 ---
 
-### 3. Stakeholder Requirements Document
+### 4. Stakeholder Requirements Document
 **File:** [stakeholder-requirements.md](stakeholder-requirements.md)  
 **Status:** ✅ Complete  
 **Purpose:** Personal requirements based on current Excel system
@@ -122,7 +141,7 @@ docs/
 
 ---
 
-### 4. Competitive Analysis
+### 5. Competitive Analysis
 **File:** [competitive-analysis.md](competitive-analysis.md)  
 **Status:** ✅ Complete  
 **Purpose:** Analysis of existing portfolio management solutions
@@ -146,7 +165,7 @@ docs/
 
 ---
 
-### 5. Project Roadmap
+### 6. Project Roadmap
 **File:** [project-roadmap.md](project-roadmap.md)  
 **Status:** ✅ Complete  
 **Purpose:** Project phases, milestones, and timeline
@@ -170,12 +189,12 @@ docs/
 
 ---
 
-### 6. Diagrams Collection
+### 7. Diagrams Collection
 **Directory:** [diagrams/](diagrams/)  
 **Status:** ✅ Complete  
 **Purpose:** Visual documentation using Mermaid diagrams
 
-#### 6a. System Architecture Diagrams
+#### 7a. System Architecture Diagrams
 **File:** [diagrams/system-architecture.md](diagrams/system-architecture.md)
 
 **Contains:**
@@ -187,7 +206,7 @@ docs/
 
 **Diagrams:** 5 comprehensive architecture diagrams
 
-#### 6b. Use Case Flow Diagrams
+#### 7b. Use Case Flow Diagrams
 **File:** [diagrams/use-case-flows.md](diagrams/use-case-flows.md)
 
 **Contains:**
@@ -204,7 +223,7 @@ docs/
 
 **Diagrams:** 10 sequence and flowchart diagrams
 
-#### 6c. Data Flow & State Management
+#### 7c. Data Flow & State Management
 **File:** [diagrams/data-flow.md](diagrams/data-flow.md)
 
 **Contains:**

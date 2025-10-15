@@ -313,7 +313,7 @@ For each stock/holding, display:
 - Tax reporting tools
 - Historical performance charts
 - Portfolio optimization suggestions
-- Audit trail logging
+- Audit trail or change history logging
 - Price/exchange rate caching
 
 ---
@@ -346,7 +346,8 @@ For each stock/holding, display:
 17. As a viewer, I want to see portfolio data without being able to make changes so I can monitor performance safely.
 18. As a user, I want to use the app on my phone and desktop so I can check investments anywhere.
 19. As a user, I want the app to automatically calculate all values so I don't need manual Excel formulas.
-20. As a user, I want to record transaction costs/fees so my profit calculations are accurate.
+20. As a user, I want to optionally record transaction costs/fees so my profit calculations can be accurate.
+21. As a user, I want to edit all holding values and cash balances at any time so I can correct errors, add fees discovered later, or adjust for dividends and other events.
 
 ---
 
@@ -357,6 +358,13 @@ For each stock/holding, display:
 - **Phase 2:** CSV import for bulk data
 - **Future:** API integration with brokers for automatic syncing
 
+### Transaction & Balance Management Philosophy
+- **Flexible Data Entry:** All transaction amounts, fees, and costs are optional fields
+- **Calculate with Available Data:** System calculates with whatever values are provided
+- **Fully Editable:** All holding values (quantity, price, fees, total invested) and cash balances remain editable after creation
+- **No Audit Trail:** Only current final values are stored, no historical change tracking
+- **Manual Adjustments:** Users can adjust any value at any time for dividends, interest, fees, or corrections
+
 ### Price Data Source
 - **Primary:** Google Finance API (real-time queries, no caching)
 - **Backup:** Manual price entry option
@@ -364,10 +372,10 @@ For each stock/holding, display:
 - **Currency Conversion:** Real-time exchange rates via Google Finance API
 
 ### Calculation Requirements
-- All profit/loss calculations automatic
+- All profit/loss calculations automatic based on current values
 - Currency conversions using live exchange rates
-- Real-time recalculation when prices update
-- Maintain calculation audit trail (future)
+- Real-time recalculation when prices or values update
+- No calculation audit trail or history maintained
 
 ---
 
