@@ -22,41 +22,32 @@
 
 ## Project Plan
 
-### 1. Competitive Analysis
+### 1. Competitive Analysis (✅ Completed)
+See `docs/competitive-analysis.md`
+A thorough review of leading portfolio management apps was conducted. Key features, pain points, and MVP recommendations were documented to inform Prosperity’s direction.
 
-**Objective:** Understand the landscape and gather inspiration from popular stock portfolio managers.  
-**Action Items:**
-- Research and document core features, UX/UI approaches, and pricing models of leading solutions such as:
-  - Personal Capital
-  - Yahoo Finance Portfolio
-  - Sharesight
-  - Morningstar Portfolio Manager
-  - Delta Investment Tracker
-- Identify strengths and weaknesses, focusing on:
-  - Account types supported
-  - Real-time pricing accuracy
-  - Reporting and analytics
-  - Security and privacy measures
-  - User onboarding and authentication flows
+### 2. Stakeholder Requirements (✅ Completed)
+See `docs/stakeholder-requirements.md`
+A detailed requirements document was created based on current workflows and future needs, covering accounts, data points, reporting, and user stories.
 
-### 2. Stakeholder Questionnaire
+### 3. Architecture Design (✅ Completed)
+See `docs/architecture-design.md`
+A comprehensive architecture was designed, including technology stack, system components, data flow, security, and cost analysis. The solution leverages a Blazor WASM frontend (AWS S3/CloudFront) and a Go-based Azure Functions backend.
 
-**Objective:** Gather detailed requirements to inform the Product Requirements Document (PRD).
+### 4. Full Project Roadmap (🚧 Incomplete)
+Define implementation phases, break down MVP and future features, and set milestones for each stage of the project.
 
-**Sample Questions:**
-- What types of assets should be supported (stocks, ETFs, crypto, property, etc.)?
-- Should the app support currencies and currency conversion?
-- What level of reporting is needed (graphs, tax reports, performance over time)?
-- What customizations should users have per account (naming, icons, grouping)?
-- Should users be able to import/export portfolio data?
-- What notification features are desired (price alerts, dividend alerts, etc.)?
-- What are the authentication requirements (OAuth, 2FA, SSO)?
-- How often should pricing data be refreshed? Is historical data required?
-- Should there be mobile support or a responsive web design?
-- Are there any compliance or regulatory considerations?
-- What are the preferred third-party integrations (e.g., Google Finance, broker APIs)?
+### 5. Core Development (🚧 Incomplete)
+Set up infrastructure, implement authentication, develop core pages, integrate live pricing, and build backend logic and data layers.
 
-### 3. Architecture Brainstorm
+### 6. Testing & QA (🚧 Incomplete)
+Develop and run unit/integration tests, perform manual QA, and conduct security and performance testing.
+
+### 7. Deployment (🚧 Incomplete)
+Configure DNS, deploy to production, enable HTTPS, and set up monitoring/logging.
+
+### 8. Iteration & Feature Expansion (🚧 Incomplete)
+Add advanced features, improve UX, and iterate based on user feedback.
 
 **Objective:** Design a scalable, maintainable, and secure system architecture.
 

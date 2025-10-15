@@ -185,33 +185,33 @@ This document outlines the technical architecture for **Prosperity**, a personal
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                          User Browser                        │
+│                          User Browser                       │
 │  ┌────────────────────────────────────────────────────────┐ │
 │  │         Blazor WebAssembly Application                 │ │
-│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐              │ │
-│  │  │Dashboard │ │Investment│ │ Dividends│              │ │
-│  │  │   Page   │ │   Page   │ │   Page   │              │ │
-│  │  └──────────┘ └──────────┘ └──────────┘              │ │
-│  │                                                         │ │
-│  │  ┌─────────────────────────────────────────────────┐  │ │
-│  │  │         State Management (Fluxor)               │  │ │
-│  │  └─────────────────────────────────────────────────┘  │ │
-│  │                                                         │ │
-│  │  ┌─────────────────────────────────────────────────┐  │ │
-│  │  │         API Service Layer (HttpClient)          │  │ │
-│  │  └─────────────────────────────────────────────────┘  │ │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────────────────┐    │ │
+│  │  │Dashboard │ │Investment│ │Deposits & Transfers  │    │ │
+│  │  │   Page   │ │   Page   │ │        Page          │    │ │
+│  │  └──────────┘ └──────────┘ └──────────────────────┘    │ │
+│  │                                                        │ │
+│  │  ┌─────────────────────────────────────────────────┐   │ │
+│  │  │         State Management (Fluxor)               │   │ │
+│  │  └─────────────────────────────────────────────────┘   │ │
+│  │                                                        │ │
+│  │  ┌─────────────────────────────────────────────────┐   │ │
+│  │  │         API Service Layer (HttpClient)          │   │ │
+│  │  └─────────────────────────────────────────────────┘   │ │
 │  └────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
                            │
                            │ HTTPS (CORS)
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                         AWS Cloud                            │
+│                         AWS Cloud                           │
 │  ┌────────────────────────────────────────────────────────┐ │
 │  │              CloudFront CDN                            │ │
 │  │      (Custom Domain: prosperity.yourdomain.com)        │ │
 │  └─────────────────────┬──────────────────────────────────┘ │
-│                        │                                     │
+│                        │                                    │
 │  ┌─────────────────────▼──────────────────────────────────┐ │
 │  │         S3 Bucket (Static Hosting)                     │ │
 │  │    - index.html, Blazor WASM files                     │ │
@@ -224,55 +224,55 @@ This document outlines the technical architecture for **Prosperity**, a personal
                            │ (Authorization: Bearer <JWT>)
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                        Azure Cloud                           │
+│                        Azure Cloud                          │
 │  ┌────────────────────────────────────────────────────────┐ │
 │  │            Azure Functions (Go Runtime)                │ │
-│  │  ┌──────────────────────────────────────────────────┐ │ │
-│  │  │  HTTP Triggers (API Endpoints)                   │ │ │
-│  │  │  - GET  /api/accounts                            │ │ │
-│  │  │  - GET  /api/holdings                            │ │ │
-│  │  │  - POST /api/holdings                            │ │ │
-│  │  │  - PUT  /api/holdings/{id}                       │ │ │
-│  │  │  - DELETE /api/holdings/{id}                     │ │ │
-│  │  │  - GET  /api/dividends                           │ │ │
-│  │  │  - POST /api/auth/login                          │ │ │
-│  │  │  - GET  /api/prices/refresh                      │ │ │
-│  │  └──────────────────────────────────────────────────┘ │ │
-│  │                                                         │ │
-│  │  ┌──────────────────────────────────────────────────┐ │ │
-│  │  │  Middleware Layer                                │ │ │
-│  │  │  - JWT Validation                                │ │ │
-│  │  │  - CORS Configuration                            │ │ │
-│  │  │  - Error Handling                                │ │ │
-│  │  │  - Logging                                       │ │ │
-│  │  └──────────────────────────────────────────────────┘ │ │
-│  │                                                         │ │
-│  │  ┌──────────────────────────────────────────────────┐ │ │
-│  │  │  Service Layer (Business Logic)                 │ │ │
-│  │  │  - Portfolio calculations                        │ │ │
-│  │  │  - Currency conversions                          │ │ │
-│  │  │  - P/L computations                              │ │ │
-│  │  └──────────────────────────────────────────────────┘ │ │
-│  │                                                         │ │
-│  │  ┌──────────────────────────────────────────────────┐ │ │
-│  │  │  Data Access Layer                               │ │ │
-│  │  │  - Cosmos DB SDK                                 │ │ │
-│  │  │  - Query builders                                │ │ │
-│  │  └──────────────────────────────────────────────────┘ │ │
+│  │  ┌───────────────────────────────────────────────────┐ │ │
+│  │  │  HTTP Triggers (API Endpoints)                    │ │ │
+│  │  │  - GET  /api/accounts                             │ │ │
+│  │  │  - GET  /api/holdings                             │ │ │
+│  │  │  - POST /api/holdings                             │ │ │
+│  │  │  - PUT  /api/holdings/{id}                        │ │ │
+│  │  │  - DELETE /api/holdings/{id}                      │ │ │
+│  │  │  - GET  /api/dividends                            │ │ │
+│  │  │  - POST /api/auth/login                           │ │ │
+│  │  │  - GET  /api/prices/refresh                       │ │ │
+│  │  └───────────────────────────────────────────────────┘ │ │
+│  │                                                        │ │
+│  │  ┌───────────────────────────────────────────────────┐ │ │
+│  │  │  Middleware Layer                                 │ │ │
+│  │  │  - JWT Validation                                 │ │ │
+│  │  │  - CORS Configuration                             │ │ │
+│  │  │  - Error Handling                                 │ │ │
+│  │  │  - Logging                                        │ │ │
+│  │  └───────────────────────────────────────────────────┘ │ │
+│  │                                                        │ │
+│  │  ┌───────────────────────────────────────────────────┐ │ │
+│  │  │  Service Layer (Business Logic)                   │ │ │
+│  │  │  - Portfolio calculations                         │ │ │
+│  │  │  - Currency conversions                           │ │ │
+│  │  │  - P/L computations                               │ │ │
+│  │  └───────────────────────────────────────────────────┘ │ │
+│  │                                                        │ │
+│  │  ┌───────────────────────────────────────────────────┐ │ │
+│  │  │  Data Access Layer                                │ │ │
+│  │  │  - Cosmos DB SDK                                  │ │ │
+│  │  │  - Query builders                                 │ │ │
+│  │  └───────────────────────────────────────────────────┘ │ │
 │  └────────────────────────────────────────────────────────┘ │
-│                                                              │
+│                                                             │
 │  ┌────────────────────────────────────────────────────────┐ │
 │  │         Azure Cosmos DB (NoSQL)                        │ │
-│  │  ┌────────────┐ ┌────────────┐ ┌──────────────┐      │ │
-│  │  │  accounts  │ │  holdings  │ │ transactions │      │ │
-│  │  │ collection │ │ collection │ │  collection  │      │ │
-│  │  └────────────┘ └────────────┘ └──────────────┘      │ │
-│  │  ┌────────────┐ ┌────────────┐                        │ │
-│  │  │ dividends  │ │   users    │                        │ │
-│  │  │ collection │ │ collection │                        │ │
-│  │  └────────────┘ └────────────┘                        │ │
+│  │  ┌────────────┐ ┌────────────┐ ┌──────────────┐        │ │
+│  │  │  accounts  │ │  holdings  │ │ transactions │        │ │
+│  │  │ collection │ │ collection │ │  collection  │        │ │
+│  │  └────────────┘ └────────────┘ └──────────────┘        │ │
+│  │  ┌────────────┐ ┌────────────┐                         │ │
+│  │  │ dividends  │ │   users    │                         │ │
+│  │  │ collection │ │ collection │                         │ │
+│  │  └────────────┘ └────────────┘                         │ │
 │  └────────────────────────────────────────────────────────┘ │
-│                                                              │
+│                                                             │
 │  ┌────────────────────────────────────────────────────────┐ │
 │  │         Azure AD B2C (Optional)                        │ │
 │  │         - User authentication                          │ │
@@ -284,7 +284,7 @@ This document outlines the technical architecture for **Prosperity**, a personal
                            │ External API Calls (Scheduled)
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    External Services                         │
+│                    External Services                        │
 │  ┌────────────────┐  ┌──────────────────┐                   │
 │  │  Alpha Vantage │  │ ExchangeRate-API │                   │
 │  │  (Stock Prices)│  │  (FX Rates)      │                   │
@@ -313,11 +313,14 @@ This document outlines the technical architecture for **Prosperity**, a personal
 - Filtering and sorting
 - Real-time price display
 
-**Dividends.razor**
-- Transaction history table
-- Add dividend/deposit form
-- Summary calculations
-- Date filtering
+**DepositsAndTransfers.razor**
+- Deposit and transfer entry form (relates to accounts from Investments page)
+- List of all deposits and transfers (with account references)
+- Ability to input new deposits (assign to account)
+- Ability to input transfers (from/to accounts)
+- Summary of total deposits and transfers
+- Date filtering and search
+- Data used for annualised performance stats (along with total portfolio balance)
 
 **Auth/Login.razor**
 - Login form
