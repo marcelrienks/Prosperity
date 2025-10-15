@@ -31,12 +31,132 @@ This system follows a flexible, user-controlled data management approach:
 
 ---
 
+## UI Loading Strategy - Hierarchical Panel System
+
+**Progressive Disclosure with Smart Background Refresh:**
+
+The interface uses a hierarchical panel system with stored calculated values and intelligent data freshness management:
+
+1. **Panel Hierarchy**:
+   - **Portfolio Panel** (top level) - Shows total portfolio summary
+   - **Account Panels** (sub-level) - Shows account summaries when portfolio expanded
+   - **Stock Panels** (detail level) - Shows individual stock details when account expanded
+
+2. **Data Storage Strategy**:
+   - **Stock Level**: All values stored with price, calculations, and `lastUpdated` timestamp
+   - **Account Level**: Pre-calculated totals from constituent stocks with `lastUpdated` timestamp
+   - **Portfolio Level**: Pre-calculated totals from all accounts with `lastUpdated` timestamp
+
+3. **Initial Load Behavior**:
+   - Single bulk database lookup retrieves all stored data
+   - Interface populates immediately with stored values
+   - Fast initial render (< 2 seconds) using pre-calculated data
+
+4. **Data Freshness System**:
+   - **Fresh Data** (< 15 minutes): Display normally with clean interface
+   - **Stale Data** (> 15 minutes): Display with dark overlay + faint spinner
+   - User sees data immediately but knows it's being refreshed
+
+5. **Background Refresh Process**:
+   - Triggered automatically when stale data detected
+   - Also triggered on panel expansions if data is stale
+   - Bulk API call fetches all live prices and exchange rates
+   - All calculations updated in backend
+   - Database bulk update with new values and timestamps
+   - Interface receives fresh data and removes overlays/spinners
+
+6. **User Experience Benefits**:
+   - **Immediate Response**: Interface always loads instantly
+   - **Data Availability**: Never blocked by API calls or network issues
+   - **Visual Feedback**: Clear indication when data is being refreshed
+   - **Progressive Enhancement**: Fresh data replaces stale data seamlessly
+   - **Reduced API Costs**: Bulk operations instead of individual calls
+
+### Panel Interaction & Background Refresh Flow
+
+```mermaid
+flowchart TD
+    Start[User Interaction<br/>Load/Expand Panel]
+    
+    Start --> LoadStored[Load Stored Data<br/>from Database]
+    
+    LoadStored --> CheckTime{Data Age<br/>< 15 minutes?}
+    
+    CheckTime -->|Yes| ShowFresh[Display Clean Interface<br/>No Overlay/Spinner]
+    
+    CheckTime -->|No| ShowStale[Display with Dark Overlay<br/>+ Faint Spinner]
+    
+    ShowStale --> Background[Background Process:<br/>Bulk Data Refresh]
+    
+    Background --> BulkAPI[Bulk API Call:<br/>All Prices + FX Rates]
+    
+    BulkAPI --> Calculate[Calculate All Values:<br/>- Stock Levels<br/>- Account Totals<br/>- Portfolio Totals]
+    
+    Calculate --> BulkUpdate[Bulk Database Update<br/>All Levels + Timestamps]
+    
+    BulkUpdate --> Return[Return Fresh Data<br/>to Interface]
+    
+    Return --> UpdateUI[Update All Panels<br/>Remove Overlays/Spinners]
+    
+    ShowFresh --> UserReady[User Interacts<br/>with Fresh Data]
+    UpdateUI --> UserReady
+    
+    UserReady --> End[Interface Ready<br/>All Data Fresh]
+
+    style Start fill:#e1f5ff
+    style ShowStale fill:#fff3cd
+    style Background fill:#d4edda
+    style BulkAPI fill:#d4edda
+    style ShowFresh fill:#d4edda
+    style UpdateUI fill:#d4edda
+    style End fill:#d4edda
+```
+
+### Hierarchical Panel Structure
+
+```mermaid
+flowchart TD
+    Portfolio[Portfolio Panel<br/>Total Value: R1,250,000<br/>Total P/L: +15.2%<br/>Last Updated: 10:45 AM]
+    
+    Portfolio -->|Expand| Account1[Account Panel: TFSA<br/>Value: R350,000<br/>P/L: +12.8%<br/>Cash: R5,000<br/>Last Updated: 10:45 AM]
+    
+    Portfolio -->|Expand| Account2[Account Panel: US<br/>Value: R450,000<br/>P/L: +18.7%<br/>Cash: R15,000<br/>Last Updated: 10:45 AM]
+    
+    Portfolio -->|Expand| Account3[Account Panel: ZA<br/>Value: R350,000<br/>P/L: +14.1%<br/>Cash: R8,000<br/>Last Updated: 10:45 AM]
+    
+    Account1 -->|Expand| Stock1[Stock Panel: ANH<br/>Qty: 1000<br/>Price: R125.50<br/>Value: R125,500<br/>P/L: +8.2%<br/>Last Updated: 10:45 AM]
+    
+    Account2 -->|Expand| Stock2[Stock Panel: AAPL<br/>Qty: 15<br/>Price: $175.80<br/>Value: $2,637<br/>P/L: +15.8%<br/>Last Updated: 10:45 AM]
+    
+    Account3 -->|Expand| Stock3[Stock Panel: SHP<br/>Qty: 500<br/>Price: R156.25<br/>Value: R78,125<br/>P/L: +12.4%<br/>Last Updated: 10:45 AM]
+    
+    subgraph Fresh["Fresh Data (< 15min)"]
+        Stock1
+        Stock2
+    end
+    
+    subgraph Stale["Stale Data (> 15min)"]
+        Stock3
+    end
+    
+    style Portfolio fill:#e1f5ff
+    style Account1 fill:#fff3cd
+    style Account2 fill:#fff3cd
+    style Account3 fill:#fff3cd
+    style Fresh fill:#d4edda
+    style Stale fill:#f8d7da
+```
+
+---
+
 ## Table of Contents
-1. [Data Flow Overview](#data-flow-overview)
-2. [State Management (Fluxor)](#state-management-fluxor)
-3. [Portfolio Calculation Flow](#portfolio-calculation-flow)
-4. [Cash Balance Management Flow](#cash-balance-management-flow)
-5. [Multi-Currency Conversion Flow](#multi-currency-conversion-flow)
+1. [UI Loading Strategy - Hierarchical Panel System](#ui-loading-strategy---hierarchical-panel-system)
+2. [Hierarchical Panel Structure](#hierarchical-panel-structure)
+3. [Data Flow Overview](#data-flow-overview)
+4. [State Management (Fluxor)](#state-management-fluxor)
+5. [Portfolio Calculation Flow](#portfolio-calculation-flow)
+6. [Cash Balance Management Flow](#cash-balance-management-flow)
+7. [Multi-Currency Conversion Flow](#multi-currency-conversion-flow)
 
 ---
 
@@ -64,7 +184,6 @@ flowchart TB
     end
     
     subgraph Data["Data Layer"]
-        Cache[(Price Cache<br/>15 min TTL)]
         DB[(Cosmos DB)]
     end
     
@@ -81,22 +200,21 @@ flowchart TB
     Handler -->|Validate| Middleware
     Middleware -->|Process| Business
     
-    Business -->|External Data?| ExtAPI
-    ExtAPI -->|Response| Business
-    Business -->|Cache| Cache
+    Business -->|Bulk Refresh?| ExtAPI
+    ExtAPI -->|All Prices/Rates| Business
     
-    Business -->|Query/Update| Repo
-    Repo -->|CRUD| DB
+    Business -->|Bulk Query/Update| Repo
+    Repo -->|Stored Data + Bulk Updates| DB
     
-    DB -->|Result| Repo
-    Repo -->|Data| Business
-    Business -->|Response| Handler
-    Handler -->|JSON| Service
+    DB -->|Pre-calculated Data| Repo
+    Repo -->|Hierarchical Data| Business
+    Business -->|Panel Data + Freshness| Handler
+    Handler -->|JSON + Timestamps| Service
     
     Service -->|Success| Effect
-    Effect -->|Update| State
-    State -->|Re-render| UI
-    UI -->|Display| User
+    Effect -->|Update Panel State| State
+    State -->|Re-render Panels| UI
+    UI -->|Display with Freshness Indicators| User
 
     style User fill:#e1f5ff
     style Frontend fill:#fff3cd
@@ -176,57 +294,55 @@ flowchart TB
 
 ---
 
-## Portfolio Calculation Flow
+## Portfolio Calculation & Storage Flow
 
-This diagram shows how portfolio metrics are calculated from raw data.
+This diagram shows how portfolio metrics are calculated, stored, and retrieved with timestamp tracking.
 
 ```mermaid
 flowchart TD
-    Start[Raw Portfolio Data]
+    Trigger[Background Refresh Triggered<br/>Data > 15 minutes old]
     
-    Start --> Holdings[Holdings Data]
-    Start --> Accounts[Accounts Data]
-    Start --> Trans[Transactions Data]
+    Trigger --> Fetch[Bulk API Fetch<br/>All Current Prices + FX Rates]
     
+    Fetch --> Holdings[Calculate Stock Level]
     Holdings --> H1{For Each Holding}
     H1 --> H2[Current Price × Quantity<br/>= Current Value]
     H2 --> H3[Current Value - Total Invested<br/>= Profit/Loss Amount]
     H3 --> H4["(P/L Amount / Total Invested) × 100<br/>= P/L Percentage"]
-    H4 --> H5[Currency Conversion<br/>if needed]
+    H4 --> H5[Currency Conversion<br/>with fresh FX rates]
     
-    H5 --> AccSum[Account Summary]
+    H5 --> Store1[Store Stock Data:<br/>- All calculated values<br/>- Current price<br/>- lastUpdated timestamp]
     
-    Accounts --> A1{For Each Account}
+    Store1 --> AccLevel[Calculate Account Level]
+    AccLevel --> A1{For Each Account}
     A1 --> A2[Sum Holdings Current Values<br/>= Account Current Value]
     A2 --> A3[Sum Holdings Total Invested<br/>= Account Invested]
     A3 --> A4[Account Current Value - Account Invested<br/>= Account P/L]
-    A4 --> A5[Account Cash Balance<br/>from Deposits/Transfers]
-    A5 --> A6[Account Current Value + Cash<br/>= Account Total Balance]
+    A4 --> A5[Account Cash Balance<br/>+ Account Current Value<br/>= Account Total Balance]
     
-    A6 --> AccSum
+    A5 --> Store2[Store Account Data:<br/>- All calculated totals<br/>- lastUpdated timestamp]
     
-    Trans --> T1[Sum Deposits per Account<br/>= Account Deposited]
-    T1 --> T2[Apply Transfers<br/>+/- between accounts]
-    T2 --> AccSum
+    Store2 --> PortLevel[Calculate Portfolio Level]
+    PortLevel --> P1[Sum All Account Values<br/>= Total Current Value]
+    P1 --> P2[Sum All Account Invested<br/>= Total Invested]
+    P2 --> P3[Sum All Account Cash<br/>= Total Cash]
+    P3 --> P4[Total Current Value - Total Invested<br/>= Total P/L]
     
-    AccSum --> Port[Portfolio Totals]
-    Port --> P1[Sum All Account Current Values<br/>= Total Current Value]
-    Port --> P2[Sum All Account Invested<br/>= Total Invested]
-    Port --> P3[Sum All Account Cash<br/>= Total Cash]
-    Port --> P4[Total Current Value - Total Invested<br/>= Total P/L]
-    Port --> P5[Sum All Deposited<br/>= Total Deposited]
+    P4 --> Store3[Store Portfolio Data:<br/>- All calculated totals<br/>- lastUpdated timestamp]
     
-    P1 --> Final
-    P2 --> Final
-    P3 --> Final
-    P4 --> Final
-    P5 --> Final[Portfolio Summary]
+    Store3 --> BulkDB[Bulk Database Update<br/>All Levels + Timestamps]
     
-    Final --> Display[Display on Dashboard]
+    BulkDB --> Return[Return Fresh Data<br/>to Interface]
+    
+    Return --> Update[Update All Panels<br/>Remove Stale Indicators]
 
-    style Start fill:#e1f5ff
-    style Final fill:#d4edda
-    style Display fill:#d4edda
+    style Trigger fill:#e1f5ff
+    style Fetch fill:#d4edda
+    style Store1 fill:#fff3cd
+    style Store2 fill:#fff3cd
+    style Store3 fill:#fff3cd
+    style BulkDB fill:#d4edda
+    style Update fill:#d4edda
 ```
 
 ---
@@ -324,21 +440,9 @@ flowchart TB
         API3
     end
     
-    API1 --> Cache1{Check Cache<br/>24h TTL}
-    API2 --> Cache2{Check Cache<br/>24h TTL}
-    API3 --> Cache3{Check Cache<br/>24h TTL}
-    
-    Cache1 -->|Cached| Rate1[Use Cached Rate]
-    Cache1 -->|Stale| Fetch1[Fetch Fresh Rate]
-    Fetch1 --> Rate1
-    
-    Cache2 -->|Cached| Rate2[Use Cached Rate]
-    Cache2 -->|Stale| Fetch2[Fetch Fresh Rate]
-    Fetch2 --> Rate2
-    
-    Cache3 -->|Cached| Rate3[Use Cached Rate]
-    Cache3 -->|Stale| Fetch3[Fetch Fresh Rate]
-    Fetch3 --> Rate3
+    API1 --> Rate1[Fetch Fresh Rate]
+    API2 --> Rate2[Fetch Fresh Rate]
+    API3 --> Rate3[Fetch Fresh Rate]
     
     Rate1 --> Convert1[Value USD × Rate<br/>= Value ZAR]
     Rate2 --> Convert2[Value EUR × Rate<br/>= Value ZAR]

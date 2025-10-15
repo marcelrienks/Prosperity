@@ -460,59 +460,45 @@ Investments Page
 - [ ] Account totals update correctly
 - [ ] Success message displayed
 
-#### FR-2.6: Price Refresh
-**Description:** Manually refresh stock prices for all holdings by querying Google Finance API.
+#### FR-2.6: Hierarchical Panel System with Smart Background Refresh
+**Description:** Display portfolio data using collapsible panels with pre-calculated stored values and intelligent background refresh when data becomes stale.
 
-**Behavior:**
-- "Refresh Prices" button visible on Investments page
-- On click:
-  1. Display loading indicator
-  2. Fetch current prices for all unique ticker/exchange combinations from Google Finance API
-  3. Update current price for each holding
-  4. Recalculate current value and P/L for each holding
-  5. Update last updated timestamp
-  6. Refresh page display
-  7. Hide loading indicator
-  8. Display success message with number of prices updated
+**Panel Hierarchy:**
+- **Portfolio Panel** (top level): Shows total portfolio summary
+- **Account Panels** (when portfolio expanded): Shows account summaries  
+- **Stock Panels** (when account expanded): Shows individual stock details
 
-**Error Handling:**
-- If Google Finance API fails for a specific stock:
-  - Display error icon next to that stock's price
-  - Show tooltip: "Unable to fetch price for [TICKER]"
-  - Do NOT update that stock's price (keep previous value if exists)
-  - Continue updating other stocks
-- If API completely unavailable:
-  - Display global error message: "Unable to refresh prices. Please try again later."
-  - Keep all previous prices
+**Data Storage & Freshness:**
+- **All levels store calculated values** with `lastUpdated` timestamps
+- **Stock Level**: Price, current value, P/L, all calculations stored
+- **Account Level**: Pre-calculated totals from constituent stocks stored
+- **Portfolio Level**: Pre-calculated totals from all accounts stored
 
-**No Price Caching:**
-- Prices are queried in real-time on each refresh
-- No caching mechanism implemented
-- Every refresh is a fresh API call to Google Finance
+**Interface Loading:**
+- **Initial Load**: Single bulk database lookup retrieves all stored data
+- **Immediate Display**: Interface populates instantly with stored values
+- **Fast Render**: < 2 seconds using pre-calculated data
 
-**Acceptance Criteria:**
-- [ ] Refresh button accessible and functional
-- [ ] Loading indicator displays during fetch
-- [ ] All stock prices update successfully
-- [ ] Current values and P/L recalculated
-- [ ] Timestamp updates after refresh
-- [ ] Error handling graceful for API failures
-- [ ] Partial failures don't block other price updates
-- [ ] No caching - always fresh data
-  - Do NOT update that stock's price (keep previous value)
-  - Continue updating other stocks
-- If API completely unavailable:
-  - Display global error message: "Unable to refresh prices. Please try again later."
-  - Keep all previous prices
+**Data Freshness System:**
+- **Fresh Data** (< 15 minutes): Display with clean interface
+- **Stale Data** (> 15 minutes): Display with dark overlay + faint spinner
+- **User Experience**: Data visible immediately but indicates refresh in progress
+
+**Background Refresh Process:**
+- **Auto-triggered** when stale data detected on load or expansion
+- **Bulk API Call** fetches all current prices and exchange rates
+- **Backend Processing** updates all calculations at all levels
+- **Bulk Database Update** stores new values and timestamps
+- **Interface Update** receives fresh data and removes stale indicators
 
 **Acceptance Criteria:**
-- [ ] Refresh button accessible and functional
-- [ ] Loading indicator displays during fetch
-- [ ] All stock prices update successfully
-- [ ] Current values and P/L recalculated
-- [ ] Timestamp updates after refresh
-- [ ] Error handling graceful for API failures
-- [ ] Partial failures don't block other price updates
+- [ ] Interface loads instantly with stored data
+- [ ] Stale data displayed with visual indicators
+- [ ] Background refresh updates all levels
+- [ ] Fresh data removes all stale indicators
+- [ ] Panel expansion respects data freshness
+- [ ] Bulk updates minimize API calls
+- [ ] All calculated values stored with timestamps
 
 ---
 
@@ -1171,10 +1157,11 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 - Expanded account: < 1 second
 - Deposits & Transfers Page: < 2 seconds
 
-**Price Refresh:**
-- All stocks (54+): < 10 seconds total
-- Single stock: < 1 second
-- Cache prices for 15 minutes to minimize API calls
+**Hierarchical Panel Loading:**
+- Initial load (stored data): < 2 seconds
+- Background bulk refresh: < 10 seconds
+- Panel expansion (fresh data): immediate
+- Panel expansion (stale data): shows immediately, refreshes in background
 
 **Responsiveness:**
 - UI interactions: < 100ms response time
@@ -1182,7 +1169,9 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 
 **Acceptance Criteria:**
 - [ ] Page load times meet targets on standard broadband
-- [ ] Price refresh completes within 10 seconds
+- [ ] Initial load completes within 2 seconds
+- [ ] Background refresh completes within 10 seconds
+- [ ] Panel expansions are immediate with stored data
 - [ ] UI feels responsive and snappy
 
 ---
@@ -1198,7 +1187,7 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 **Future Considerations:**
 - Architecture supports multiple users (partitioned by userId)
 - Database can scale to thousands of holdings
-- API rate limits managed with caching
+- API rate limits managed with on-demand loading
 
 **Acceptance Criteria:**
 - [ ] Application handles 100+ holdings without performance degradation
@@ -1480,6 +1469,12 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 - `createdAt` (timestamp)
 - `lastLogin` (timestamp)
 - `preferences` (JSON: theme, dateFormat, etc.)
+- `portfolioTotalValue` (decimal, pre-calculated total portfolio value)
+- `portfolioTotalInvested` (decimal, pre-calculated total invested)
+- `portfolioTotalCash` (decimal, pre-calculated total cash balance)
+- `portfolioTotalProfitLoss` (decimal, pre-calculated total P/L)
+- `portfolioTotalProfitLossPercent` (decimal, pre-calculated total P/L %)
+- `portfolioLastUpdated` (timestamp, when portfolio totals were last calculated)
 
 **Account**
 - `id` (UUID)
@@ -1489,6 +1484,11 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 - `description` (optional)
 - `currency` (default currency for account, e.g., "ZAR")
 - `cashBalance` (decimal, current uninvested cash)
+- `totalValue` (decimal, pre-calculated account total value)
+- `totalInvested` (decimal, pre-calculated total invested in account)
+- `totalProfitLoss` (decimal, pre-calculated account P/L)
+- `totalProfitLossPercent` (decimal, pre-calculated account P/L %)
+- `lastUpdated` (timestamp, when totals were last calculated)
 - `createdAt` (timestamp)
 - `updatedAt` (timestamp)
 
@@ -1509,7 +1509,8 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 - `profitLoss` (decimal, currentValue - totalInvested)
 - `profitLossPercent` (decimal, calculated)
 - `currency` (e.g., "USD", "ZAR")
-- `lastPriceUpdate` (timestamp)
+- `lastPriceUpdate` (timestamp, when price was last fetched)
+- `lastCalculated` (timestamp, when values were last calculated)
 - `createdAt` (timestamp)
 - `updatedAt` (timestamp)
 
@@ -1612,9 +1613,9 @@ For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Tran
 - Parse response for current price and exchange rates
 - Handle errors gracefully (stock not found, API unavailable)
 
-**No Caching Strategy:**
-- All prices and exchange rates fetched in real-time
-- Every request is a fresh API call
+**Real-Time Data Strategy:**
+- All prices and exchange rates fetched fresh on-demand
+- Data loaded only when UI element is expanded
 - No local storage of historical prices or rates
 
 **Error Handling:**
@@ -1727,15 +1728,15 @@ All stock prices and currency conversion handled through Google Finance API. No 
 - Allow user to manually enter prices (future enhancement)
 
 **Exchange Rate API Down:**
-- Use cached exchange rates
-- Display warning: "Using exchange rates from [date]. Conversions may not reflect current rates."
+- Display error message: "Unable to fetch current exchange rates. Please try again later."
+- Show values in original currency without conversion
 - Allow manual refresh retry
 
 **Acceptance Criteria:**
 - [ ] Error messages displayed clearly
 - [ ] Previous data remains visible
 - [ ] User can retry refresh
-- [ ] Cached data used as fallback
+- [ ] Fresh data fetched on each request
 
 ---
 

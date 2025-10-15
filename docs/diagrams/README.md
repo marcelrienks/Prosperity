@@ -45,7 +45,7 @@ Step-by-step visual representations of key user workflows and feature interactio
 - **User Authentication Flow** - Complete login sequence with JWT token generation
 - **Dashboard Load Flow** - How portfolio data is fetched, calculated, and displayed
 - **Add New Holding Flow** - Process of adding a stock purchase, including price fetching and average cost calculation
-- **Price Refresh Flow** - Manual price update process with external API integration and caching
+- **Panel Expansion & Background Refresh Flow** - Hierarchical panel system with smart background refresh
 - **Record Deposit Flow** - Depositing money into an account and updating balances
 - **Record Transfer Flow** - Transferring money between accounts with balance validation
 - **Edit Holding (Multiple Purchases)** - How average cost basis is calculated for additional stock purchases
@@ -73,7 +73,7 @@ Detailed visualizations of how data flows through the system and how application
 - **Portfolio Calculation Flow** - Step-by-step calculation of holdings, account summaries, and portfolio totals
 - **Cash Balance Management Flow** - How deposits, transfers, and purchases affect account cash balances
 - **Cash Balance Formula** - Mathematical representation of cash balance calculation
-- **Multi-Currency Conversion Flow** - Currency conversion process using ExchangeRate-API with caching
+- **Multi-Currency Conversion Flow** - Currency conversion process using ExchangeRate-API with real-time fetching
 - **Currency Conversion Example** - Concrete example of multi-currency portfolio valuation
 - **Average Cost Basis Calculation** - Detailed breakdown of averaging multiple stock purchases
 - **API Request/Response Cycle** - Complete sequence of an API call with Fluxor state updates
@@ -100,7 +100,7 @@ Detailed visualizations of how data flows through the system and how application
 - User Authentication → [use-case-flows.md](use-case-flows.md#user-authentication-flow)
 - Dashboard Load → [use-case-flows.md](use-case-flows.md#dashboard-load-flow)
 - Add Holding → [use-case-flows.md](use-case-flows.md#add-new-holding-flow)
-- Price Refresh → [use-case-flows.md](use-case-flows.md#price-refresh-flow)
+- Panel Expansion & Background Refresh → [use-case-flows.md](use-case-flows.md#panel-expansion--background-refresh-flow)
 - API Request/Response → [data-flow.md](data-flow.md#api-requestresponse-cycle)
 
 #### Flowcharts

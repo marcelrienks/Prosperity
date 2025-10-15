@@ -74,7 +74,7 @@ docs/
 
 **Key Sections:**
 - **Dashboard Requirements** - Portfolio overview, account summaries, totals
-- **Investments Management** - Holdings CRUD, expandable accounts, price refresh
+- **Investments Management** - Holdings CRUD, hierarchical panel system, smart background refresh
 - **Deposits & Transfers** - Cash flow tracking, account transfers
 - **Cash Balance Management** - Per-account cash tracking
 - **Settings** - Theme, customizable dropdowns, user preferences
@@ -213,7 +213,7 @@ docs/
 - User Authentication Flow
 - Dashboard Load Flow
 - Add New Holding Flow
-- Price Refresh Flow
+- Panel Expansion & Background Refresh Flow
 - Record Deposit Flow
 - Record Transfer Flow
 - Edit Holding (Multiple Purchases)
@@ -320,7 +320,7 @@ docs/
 **Price Updates**
 - Requirements: [PRD - FR-2.6](product-requirements-document.md#fr-26-price-refresh)
 - Integration: [Architecture - Google Finance API](architecture-design.md#external-services)
-- Flow: [Price Refresh Flow](diagrams/use-case-flows.md#price-refresh-flow)
+- Flow: [Panel Expansion & Background Refresh Flow](diagrams/use-case-flows.md#panel-expansion--background-refresh-flow)
 
 **Multi-Currency**
 - Requirements: [PRD - Data Requirements](product-requirements-document.md#data-requirements)

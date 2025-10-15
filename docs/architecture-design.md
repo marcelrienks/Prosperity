@@ -481,7 +481,6 @@ func (s *PortfolioService) GetAccountSummary(accountId string) (*AccountSummary,
 ```go
 type PriceService struct {
     apiKey string
-    cache  *PriceCache
 }
 
 func (s *PriceService) FetchStockPrice(ticker, exchange string) (float64, error)
@@ -928,12 +927,10 @@ User → Blazor WASM → Azure Functions → Cosmos DB → External API
                        (prices/refresh)
 1. User clicks "Refresh Prices" button
 2. Frontend sends GET to /api/prices/refresh
-3. Backend queries all holdings for userId
-4. For each unique ticker+exchange:
-   a. Check cache (if < 15 min old, use cached)
-   b. Otherwise, call Alpha Vantage API
-   c. Update cache
-5. Update currentPrice, currentValue, P/L for each holding
+3. Backend checks data freshness (< 15 minutes)
+4. If stale, bulk fetch all prices from Alpha Vantage API
+5. Calculate and store all levels: Stock → Account → Portfolio
+6. Bulk update database with new values and timestamps
 6. Batch update holdings in Cosmos DB
 7. Return updated portfolio summary
 8. Frontend re-renders with new values
@@ -955,7 +952,7 @@ User → Blazor WASM → Azure Functions → Cosmos DB → External API
 - Origin: S3 bucket
 - Custom domain: `prosperity.yourdomain.com`
 - SSL certificate: AWS Certificate Manager (ACM)
-- Caching: Default TTL 86400 (1 day)
+- Static Asset Caching: Default TTL 86400 (1 day)
 - Compress objects automatically
 - HTTP to HTTPS redirect
 
@@ -1116,7 +1113,7 @@ jobs:
 - Optimistic UI updates for better perceived performance
 
 **Backend:**
-- Price caching (15-minute TTL)
+- Background bulk refresh with 15-minute freshness window
 - Batch operations for bulk updates
 - Connection pooling for Cosmos DB
 - Asynchronous processing for non-critical operations
@@ -1194,8 +1191,8 @@ jobs:
 
 | Risk                              | Impact  | Mitigation Strategy                                    |
 |-----------------------------------|---------|--------------------------------------------------------|
-| Cross-cloud latency               | Medium  | Cache aggressively, optimize API calls, async loading |
-| External API rate limits          | High    | Implement caching, fallback to manual entry            |
+| Cross-cloud latency               | Medium  | Optimize API calls, async loading, lazy data fetching |
+| External API rate limits          | High    | Rate limiting, fallback to manual entry, error handling |
 | Go + Azure Functions complexity   | Medium  | Thorough testing, monitoring, fallback to .NET if needed |
 | Cosmos DB cost overruns           | Low     | Serverless tier limits, monitoring alerts              |
 | JWT token security                | High    | Short expiry, HTTPS only, secure storage               |

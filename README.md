@@ -457,7 +457,7 @@ The project will be considered successful if it:
 ✅ **Performance**
 - Faster than current Excel workflow
 - Page loads in < 3 seconds
-- Price refresh completes in < 10 seconds
+- Interface loads instantly with stored data, background refresh keeps it current
 
 ✅ **Quality**
 - Data security maintained

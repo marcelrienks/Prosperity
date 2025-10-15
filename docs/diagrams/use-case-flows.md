@@ -56,43 +56,44 @@ sequenceDiagram
     participant Browser as Blazor WASM
     participant API as Azure Functions
     participant DB as Cosmos DB
-    participant Cache as Price Cache
+    participant ExtAPI as External APIs
 
     User->>Browser: Navigate to Dashboard
     Browser->>Browser: Check JWT token
     
-    Browser->>API: GET /api/portfolio/summary<br/>Authorization: Bearer {token}
+    Browser->>API: GET /api/portfolio/bulk<br/>Authorization: Bearer {token}
     
-    API->>API: Validate JWT
-    API->>API: Extract userId
+    API->>API: Validate JWT & extract userId
     
-    par Fetch Accounts
-        API->>DB: Query accounts<br/>(userId)
-        DB-->>API: Accounts list
-    and Fetch Holdings
-        API->>DB: Query holdings<br/>(userId)
-        DB-->>API: Holdings list
-    and Fetch Transactions
-        API->>DB: Query transactions<br/>(userId)
-        DB-->>API: Transactions list
+    API->>DB: Bulk query<br/>User + Accounts + Holdings + Transactions
+    DB-->>API: All stored data with timestamps
+    
+    API->>API: Check data freshness<br/>(< 15 minutes?)
+    
+    alt Data Fresh
+        API-->>Browser: 200 OK<br/>{hierarchicalData, fresh: true}
+        Browser->>Browser: Render clean interface
+    else Data Stale
+        API-->>Browser: 200 OK<br/>{hierarchicalData, fresh: false}
+        Browser->>Browser: Render with dark overlay + spinner
+        
+        Browser->>API: Background refresh<br/>GET /api/portfolio/refresh
+        
+        API->>ExtAPI: Bulk fetch prices + FX rates
+        ExtAPI-->>API: Current prices + rates
+        
+        API->>API: Calculate all levels<br/>Stock → Account → Portfolio
+        
+        API->>DB: Bulk update<br/>All data + timestamps
+        DB-->>API: Success
+        
+        API-->>Browser: 200 OK<br/>{freshData, fresh: true}
+        Browser->>Browser: Update all panels<br/>Remove overlays/spinners
     end
     
-    API->>Cache: Check price cache<br/>(15 min TTL)
-    
-    alt Prices Cached
-        Cache-->>API: Cached prices
-    else Prices Stale
-        Note over API: Prices fetched<br/>on next refresh
-    end
-    
-    API->>API: Calculate totals<br/>P/L, conversions
-    API-->>Browser: 200 OK<br/>{portfolioSummary}
-    
-    Browser->>Browser: Update state (Fluxor)
-    Browser->>Browser: Render dashboard
-    Browser-->>User: Display portfolio overview
+    Browser-->>User: Display portfolio (collapsed)
 
-    Note over User,DB: Page load complete<br/>(< 3 seconds)
+    Note over User,ExtAPI: Page load: < 2 seconds<br/>Background refresh: < 10 seconds
 ```
 
 ---
@@ -154,7 +155,7 @@ sequenceDiagram
 
 ---
 
-## Price Refresh Flow
+## Panel Expansion & Background Refresh Flow
 
 ```mermaid
 sequenceDiagram
@@ -162,57 +163,43 @@ sequenceDiagram
     participant Browser as Blazor WASM
     participant API as Azure Functions
     participant DB as Cosmos DB
-    participant Cache as Price Cache
-    participant ExtAPI as Google Finance API
+    participant ExtAPI as External APIs
 
-    User->>Browser: Click "Refresh Prices"
-    Browser->>Browser: Show loading spinner
+    User->>Browser: Expand panel<br/>(Account or Stock)
     
-    Browser->>API: GET /api/prices/refresh<br/>Authorization: Bearer {token}
+    Browser->>Browser: Check data freshness<br/>(< 15 minutes?)
     
-    API->>API: Validate JWT & extract userId
-    API->>DB: Query all holdings<br/>(userId)
-    DB-->>API: Holdings list
-    
-    API->>API: Extract unique<br/>ticker+exchange pairs
-    
-    loop For each ticker
-        API->>Cache: Check cache<br/>(ticker, 15 min TTL)
+    alt Data Fresh
+        Browser->>Browser: Expand normally<br/>Show stored data
+        Browser-->>User: Display fresh data
         
-        alt Price Cached
-            Cache-->>API: Cached price
-        else Price Stale
-            API->>ExtAPI: GET /quote/{ticker}
-            
-            alt Success
-                ExtAPI-->>API: Current price
-                API->>Cache: Update cache
-            else Failure
-                ExtAPI-->>API: Error
-                Note over API: Log error<br/>Keep old price
-            end
+    else Data Stale
+        Browser->>Browser: Expand with overlay + spinner<br/>Show stored data but marked stale
+        
+        Browser->>API: Background refresh<br/>GET /api/portfolio/refresh
+        
+        API->>ExtAPI: Bulk fetch all prices + FX rates
+        ExtAPI-->>API: Current market data
+        
+        API->>API: Calculate all levels<br/>Stock → Account → Portfolio
+        
+        par Update Stock Level
+            API->>DB: Update all holdings<br/>+ timestamps
+        and Update Account Level  
+            API->>DB: Update all accounts<br/>+ timestamps
+        and Update Portfolio Level
+            API->>DB: Update user portfolio<br/>+ timestamp
         end
-    end
-    
-    API->>API: Calculate new values<br/>for all holdings<br/>(currentValue, P/L)
-    
-    API->>DB: Batch update holdings<br/>(current prices & values)
-    DB-->>API: Success
-    
-    API->>API: Aggregate portfolio<br/>summary
-    
-    API-->>Browser: 200 OK<br/>{updatedSummary, errors: []}
-    
-    Browser->>Browser: Update state
-    Browser->>Browser: Hide loading spinner
-    Browser->>Browser: Update timestamp
-    Browser-->>User: Show success<br/>"Prices updated: 54 stocks"
-    
-    alt Partial Failures
-        Browser-->>User: Show warning<br/>"3 stocks failed to update"
+        
+        DB-->>API: Bulk update success
+        
+        API-->>Browser: 200 OK<br/>{freshHierarchicalData}
+        
+        Browser->>Browser: Update all affected panels<br/>Remove overlays/spinners
+        Browser-->>User: Display refreshed data
     end
 
-    Note over User,ExtAPI: Refresh complete<br/>(< 10 seconds)
+    Note over User,ExtAPI: Fresh data: immediate<br/>Stale refresh: < 10 seconds
 ```
 
 ---
@@ -471,12 +458,9 @@ flowchart TD
     ExternalAPI -->|Yes| CallExternal[Call Google Finance /<br/>ExchangeRate API]
     CallExternal --> ExtSuccess{Success?}
     
-    ExtSuccess -->|No| CacheCheck{Cached Data?}
-    CacheCheck -->|Yes| UseCached[Use Cached Data<br/>Show Warning]
-    CacheCheck -->|No| ShowError[Show Error<br/>Keep Old Values]
+    ExtSuccess -->|No| ShowError[Show Error<br/>Keep Old Values]
     
-    ExtSuccess -->|Yes| UpdateCache[Update Cache]
-    UpdateCache --> ProcessDB
+    ExtSuccess -->|Yes| ProcessDB
     
     ExternalAPI -->|No| ProcessDB
     
@@ -488,7 +472,7 @@ flowchart TD
     ValidateData -->|No| ValidationError[400 Bad Request<br/>Show Validation Errors]
     ValidateData -->|Yes| Success[200 OK<br/>Return Data]
     
-    UseCached --> Success
+
     Success --> UpdateUI[Update UI<br/>Show Success Message]
     
     Unauthorized --> End([End])
