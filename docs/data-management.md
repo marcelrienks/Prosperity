@@ -8,12 +8,13 @@
 
 ## Quick Reference: Field Editability
 
-### Investment Fields
+#### Investment Fields
 | Field | Editable? | Calculation |
 |-------|-----------|-------------|
 | Ticker | ✏️ Yes | User entered |
 | Quantity | ✏️ **YES** | User entered |
 | Invested | ✏️ **YES** | User entered |
+| Currency | 🔒 No | Set from account currency at creation |
 | Price | 🔒 No | Fetched from API |
 | Value | 🔒 No | `quantity × price` |
 | Profit | 🔒 No | `value - invested` |
@@ -41,9 +42,9 @@
 ### Transaction Records
 | Type | Editable? | Mutability |
 |------|-----------|------------|
-| Investments | ✏️ Yes | Mutable - full edit access |
-| Deposits | 🔒 No | **Immutable** - add/delete only |
-| Transfers | 🔒 No | **Immutable** - add/delete only |
+| Investment | ✏️ Yes | Mutable - full edit access |
+| Deposit | ✏️ Yes | **Editable** - add/edit/delete |
+| Transfer | ✏️ Yes | **Editable** - add/edit/delete |
 
 ---
 
@@ -63,20 +64,36 @@ This document outlines the core philosophy for data management in the Prosperity
 
 ### 1. Data Mutability Rules
 
-**Immutable Records (Add/Delete Only):**
-- ✅ **Deposits** - Can be added or deleted, NOT edited
-- ✅ **Transfers** - Can be added or deleted, NOT edited
-- **Reason:** These form the audit trail for total capital invested and annualized return calculations
 
-**Fully Editable Records:**
-- ✅ **Investments** (stock holdings) - Fully editable at any time
+**Editability Rules:**
+- ✅ **Deposit** - Can be added, edited, or deleted
+- ✅ **Transfer** - Can be added, edited, or deleted
+- ✅ **Investment** - Fully editable at any time
 - ✅ **Account balances** - Directly editable at any time
 - ✅ **Portfolio grand total** - Calculated from investments, manually adjustable
-- **Reason:** Flexibility for corrections, updates, and manual tracking of dividends/interest
+
+**No automatic cash balance updates:** Cash balances are only updated manually, not automatically, for any deposit, transfer, or investment. This is to account for fees, exchange rates, and other real-world adjustments.
+
+**Full data refresh required:** After any addition or edit to investments, deposits, or transfers, a full data refresh is required. This recalculates all balances and values using live price data.
+
+**No average purchase price:** The system does not track or calculate average purchase price for any investment.
+
+**Standardized terminology:** The term "investment" is used throughout the documentation and UI (not "holding" or "stock").
+
+**User roles:**
+  - **Admin**: Full access to all features, configuration, and static lists
+  - **Owner**: Full access to portfolio, but not to configuration or static lists
+  - **Viewer**: Read-only access to portfolio
+
+**Documentation status:** This documentation will be finalized after the API is complete.
 
 ### 2. Minimal Required Fields
 
-**Investment Entry Requirements:**
+- **Quantity:** ✅ Required
+- **Invested Amount:** ✅ Required (total money used to buy the investment)
+- **All Other Fields:** ⚠️ Optional (fees, etc.)
+
+**Currency:** Not editable. On creation of an investment, the currency is automatically set from the account's configured currency.
 - **Quantity:** ✅ Required
 - **Invested Amount:** ✅ Required (total money used to buy the shares)
 - **All Other Fields:** ⚠️ Optional (fees, purchase price per share, etc.)
@@ -92,7 +109,7 @@ This document outlines the core philosophy for data management in the Prosperity
 **Investment Behavior:**
 - If investment doesn't exist → Insert new investment
 - If investment already exists → Update existing investment with new values
-- After operation → Recalculate all account and portfolio balances
+- After any addition or edit (investment, deposit, or transfer) → Trigger a full data refresh to recalculate all balances and values using live price data
 
 ### 4. Balance Hierarchy
 
