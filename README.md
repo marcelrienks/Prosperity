@@ -1,26 +1,35 @@
 # Prosperity
 
-**Personal Stock Portfolio Management Application**
+**Personal Stock Portfolio Tracker & Overview Tool**
 
 [![Status](https://img.shields.io/badge/status-planning-blue.svg)](https://github.com/marcelrienks/Prosperity)
 [![Phase](https://img.shields.io/badge/phase-design%20complete-green.svg)](docs/project-roadmap.md)
 [![Documentation](https://img.shields.io/badge/docs-complete-brightgreen.svg)](docs/README.md)
 [![License](https://img.shields.io/badge/license-personal-lightgrey.svg)](#)
 
-> A modern web application to replace Excel-based investment tracking with real-time price updates, automated calculations, and comprehensive portfolio analytics.
+> A modern web application for personal portfolio tracking, replacing Excel-based investment tracking with real-time price updates, minimal data entry, and flexible portfolio management.
 
 ---
 
 ## 🎯 Project Overview
 
-**Prosperity** is a personal portfolio management application designed to modernize and simplify stock investment tracking. Built as a learning project, it demonstrates a hybrid cloud architecture (AWS + Azure) using modern web technologies including Blazor WebAssembly and Go serverless functions.
+**Prosperity** is a personal portfolio tracker and overview tool designed to modernize and simplify stock investment tracking for personal use. Built as a learning project, it demonstrates a hybrid cloud architecture (AWS + Azure) using modern web technologies including Blazor WebAssembly and Go serverless functions.
+
+**Application Type:**
+- **Personal Use:** Not intended for professional or regulated financial management
+- **Portfolio Tracker:** Overview and tracking tool, not a full portfolio manager
+- **Simplified Auditing:** Audit trail only for deposits and transfers (for total invested calculations)
+- **Flexible Data Entry:** Minimal required fields (quantity + invested amount) with optional details
 
 ### Key Features
 - 📊 **Real-time Portfolio Dashboard** - Instant view of total value, P/L, and performance across all accounts
 - 💼 **Multi-Account Management** - Organize investments across TFSA, US, ZA, EUR, and Property accounts
 - 📈 **Live Price Updates** - Automatic stock price fetching via Google Finance API
 - 💱 **Multi-Currency Support** - USD, EUR, GBP with automatic conversion to ZAR
-- 💰 **Cash Flow Tracking** - Deposits, transfers, and available balances per account
+- ⚡ **Quick Entry** - Only quantity and invested amount required for adding investments
+- 💰 **Cash Flow Tracking** - Immutable deposits and transfers for audit trail
+- 💵 **Manual Balance Adjustments** - Track dividends, interest, and profits via direct balance edits
+- 🔄 **Insert or Update Logic** - Automatically updates existing investments or creates new ones
 - 📥 **Import/Export** - Bulk CSV import/export for data portability
 - 🌓 **Light/Dark Themes** - Customizable appearance
 - ⚙️ **Configurable Settings** - Customize exchanges, industries, types, and actions

@@ -30,7 +30,12 @@
 
 ## Executive Summary
 
-**Prosperity** is a personal stock portfolio management web application designed to replace an Excel-based investment tracking system. The primary purpose is to provide a modern, automated, and user-friendly interface for tracking stock investments across multiple accounts with real-time price updates, multi-currency support, and comprehensive performance analytics.
+**Prosperity** is a **personal portfolio tracker and overview tool** designed to replace an Excel-based investment tracking system. This is a personal-use application, not intended for professional or regulated financial management. The primary purpose is to provide a simple, flexible interface for tracking stock investments across multiple accounts with real-time price updates and basic performance analytics.
+
+**Application Type:**
+- **Personal Use:** Not designed for professional financial management or regulatory compliance
+- **Portfolio Tracker:** Overview and tracking tool, not a full portfolio manager
+- **Simplified Auditing:** Only deposits and transfers require audit history (for total invested and annualized return calculations)
 
 **Key Objectives:**
 - Eliminate manual Excel data entry and formula maintenance
@@ -38,7 +43,9 @@
 - Support multiple investment accounts (TFSA, US, ZA, EUR, Property)
 - Support multi-user access with role-based permissions (Admin, Owner, Viewer)
 - Calculate profit/loss, returns, and portfolio performance automatically
-- Track transaction costs and fees for accurate profit calculations
+- Track minimal required data (quantity and invested amount) with optional details (fees, costs)
+- Maintain audit trail for deposits and transfers only (for total invested tracking)
+- Enable manual tracking of dividends, interest, and profits via direct balance adjustments
 - Enable efficient portfolio management on both desktop and mobile devices
 - Serve as a learning exercise for modern web technologies (Blazor WASM, Go, Azure, AWS)
 
@@ -54,23 +61,32 @@
 ## Product Vision & Goals
 
 ### Product Vision
-Prosperity is a **multi-user portfolio management application** designed to modernize and simplify portfolio management by replacing manual Excel tracking with an automated, real-time web application. The focus is on functionality, ease of use, role-based access control, and exposure to modern cloud technologies.
+Prosperity is a **personal portfolio tracker and overview tool** designed to modernize and simplify portfolio tracking by replacing manual Excel tracking with a streamlined web application. The focus is on simplicity, minimal data entry, flexible editability, and exposure to modern cloud technologies. This is a personal-use application, not designed for professional financial management or regulatory compliance.
 
 ### Primary Goals
-1. **Functional Parity:** Replicate all capabilities of the current Excel-based system
+1. **Functional Parity:** Replicate core capabilities of the current Excel-based system
 2. **Multi-User Support:** Enable multiple users with appropriate role-based permissions
-3. **Efficiency:** Reduce time spent on portfolio tracking and manual data entry
+3. **Efficiency:** Reduce time spent on portfolio tracking with minimal required fields
 4. **Automation:** Eliminate manual price lookups and calculation errors
-5. **Learning:** Gain hands-on experience with Blazor WASM, Go, Azure, and hybrid cloud architecture
-6. **Accessibility:** Enable portfolio management from any device (desktop primary, mobile secondary)
+5. **Flexibility:** Full editability for investments, immutable audit trail for deposits/transfers
+6. **Learning:** Gain hands-on experience with Blazor WASM, Go, Azure, and hybrid cloud architecture
+7. **Accessibility:** Enable portfolio management from any device (desktop primary, mobile secondary)
+
+### Application Scope
+- **Portfolio Tracker:** Overview and tracking, not full portfolio management
+- **Personal Use:** Not intended for professional or regulated financial use
+- **Manual Income Tracking:** Dividends, interest, and profits tracked as direct balance adjustments
+- **Simplified Audit:** Only deposits/transfers require audit history (for total invested calculations)
 
 ### Non-Goals
-- Commercial product development or public SaaS platform
+- Professional or regulated financial management system
+- Comprehensive audit trail for all transactions
 - Automated broker integration or trading capabilities
+- Complex financial modeling or investment advice
 - Social features or portfolio sharing beyond defined user roles
-- Advanced financial modeling or investment advice
 - Mobile native applications (web-only responsive design)
 - Historical price caching or storage
+- Automatic average cost basis calculation (user-managed)
 
 ---
 
@@ -351,86 +367,86 @@ Investments Page
 **Description:** Form to add a new stock purchase to an account.
 
 **Required Form Fields:**
-1. **Account** - Dropdown selection (ZA, TFSA, US, EUR, Prop)
-2. **Ticker/Code** - Text input (e.g., AAPL, GOOGL)
-3. **Exchange** - Dropdown (values from Settings - customizable)
-4. **Industry** - Dropdown (values from Settings - customizable)
-5. **Type** - Dropdown (values from Settings - customizable)
-6. **Action** - Dropdown (values from Settings - customizable)
-7. **Quantity** - Numeric input (decimal allowed for fractional shares)
-8. **Purchase Price** - Numeric input (decimal, 2+ places, price per share)
-9. **Transaction Cost/Fee** - Numeric input (decimal, optional, default: 0)
-10. **Purchase Date** - Date picker
-11. **Currency** - Dropdown (values from Settings - customizable)
+#### FR-2.3: Add New Holding
+**Description:** Add a new stock holding to an account with minimal required fields and optional details.
+
+**Required Fields:**
+1. **Account** - Dropdown selection (ZA, TFSA, US, EUR, Prop) - **Required**
+2. **Ticker/Code** - Text input (e.g., AAPL, GOOGL) - **Required**
+3. **Quantity** - Numeric input (decimal allowed for fractional shares) - **Required**
+4. **Invested Amount** - Numeric input (total money spent on this purchase) - **Required**
+
+**Optional Fields:**
+5. **Purchase Price Per Share** - Numeric input (decimal, 2+ places) - Optional
+6. **Transaction Cost/Fee** - Numeric input (decimal, default: 0) - Optional
+7. **Exchange** - Dropdown (values from Settings - customizable) - Optional
+8. **Industry** - Dropdown (values from Settings - customizable) - Optional
+9. **Type** - Dropdown (values from Settings - customizable) - Optional
+10. **Action** - Dropdown (values from Settings - customizable) - Optional
+11. **Purchase Date** - Date picker - Optional
+12. **Currency** - Dropdown (values from Settings - customizable) - Optional
 
 **Behavior:**
 - Form accessible via "Add Holding" button on Investments page
-- All fields required except Action and Transaction Cost (optional)
+- Only ticker, quantity, and invested amount are required for quick entry
+- All other fields are optional and can be added later
 - Validate ticker symbol format (1-5 uppercase characters)
 - Validate numeric inputs (positive numbers only)
 - Fetch current price on form submission to populate initial current value
-- Calculate Total Cost automatically:
-  - `Total Cost = (Quantity × Purchase Price) + Transaction Cost`
-- If sufficient cash balance exists, optionally deduct Total Cost from account cash balance (user preference)
-- **Important:** All transaction fields (amounts, fees, costs) are optional inputs. If not provided at transaction time, the system calculates with available data. All holding values and account cash balances remain fully editable after creation to account for any adjustments needed (fees discovered later, dividend payments, interest, manual corrections, etc.). No audit trail is maintained - only the current final values are stored.
+- **Insert or Update Logic:**
+  - If holding exists (same ticker, same account) → Update existing holding with new values
+  - If holding doesn't exist → Insert new holding
+  - User manually manages averaging multiple purchases if desired
+- After operation, recalculate account and portfolio balances
+- **All holding values remain fully editable** after creation for corrections, fee additions, or manual adjustments
 
 **On Submit:**
-1. Validate all inputs
+1. Validate required inputs (ticker, quantity, invested)
 2. Fetch current price from Google Finance API
-3. Calculate Total Cost: `(Quantity × Purchase Price) + Transaction Cost` (use 0 if fee not provided)
-4. Calculate Total Invested: Same as Total Cost
-5. Calculate initial P/L based on current price
-6. Optionally deduct Total Cost from account cash balance (user preference)
-7. Save holding to database with all values editable
-8. Update account totals
-9. Refresh Investments page to show new holding
+3. Check if holding exists (same ticker + account)
+4. If exists → Update existing holding with provided values
+5. If new → Insert new holding
+6. Calculate current value: `Quantity × Current Price`
+7. Recalculate account totals and portfolio totals
+8. Save to database (all values remain editable)
+9. Refresh Investments page to show updated holding
 10. Display success message
 
 **Acceptance Criteria:**
 - [ ] Form accessible from Investments page
-- [ ] All required fields validated before submission
+- [ ] Only ticker, quantity, and invested amount required
+- [ ] All other fields optional and can be left blank
 - [ ] Ticker symbol validated for proper format
-- [ ] Transaction cost field optional (defaults to 0)
-- [ ] Total cost calculated correctly including fees (when provided)
+- [ ] Insert or update logic works correctly (checks for existing ticker)
 - [ ] Current price fetched successfully on submission
-- [ ] Cash balance optionally deducted (based on user settings)
-- [ ] New holding appears immediately in holdings table with all fields editable
-- [ ] Account totals update correctly
+- [ ] Account and portfolio totals recalculate correctly
+- [ ] New/updated holding appears immediately in holdings table
+- [ ] All holding values remain editable after creation
 - [ ] Error messages display for invalid inputs
-- [ ] All holding values (quantity, price, fees, total invested) remain editable after creation
 
 #### FR-2.4: Edit Existing Holding
-**Description:** Modify details of an existing stock holding, including selling (partial or full). **All fields remain editable at any time** to allow for corrections, fee adjustments, or manual updates.
+**Description:** Modify any details of an existing stock holding. **All fields remain fully editable at any time** to allow for corrections, fee adjustments, or manual updates.
 
 **Behavior:**
 - Edit button in holdings table opens edit form
 - Pre-populate form with current holding data
-- **Allow updates to ALL fields** including quantity, purchase price, fees, total invested, and currency
-- **For Additional Purchases:** User manually updates quantity, average cost, and total invested fields to reflect the additional purchase
-- **For Sales (Quantity Reduction):**
-  - Reduce quantity
-  - Enter sale price per share (optional)
-  - Enter transaction cost/fee (optional)
-  - Optionally calculate proceeds: `(Quantity Sold × Sale Price) - Transaction Cost`
-  - Optionally add proceeds to account cash balance (user preference)
-  - Update or remove holding based on remaining quantity
-- **For Manual Adjustments:** User can edit any field directly to correct errors, add fees discovered later, or adjust values for any reason
+- **Allow updates to ALL fields** including ticker, quantity, invested amount, purchase price, fees, and currency
+- **For Additional Purchases:** User manually updates quantity and invested amount to include new purchase
+- **For Sales (Quantity Reduction):** User reduces quantity and may adjust invested amount
+- **For Manual Adjustments:** User can edit any field directly for any reason (corrections, adding fees, etc.)
+- After edit, recalculate account and portfolio balances
 
 **On Submit:**
 1. Validate inputs
 2. Fetch latest current price from Google Finance API
-3. If quantity reduced (sale):
-   - Optionally calculate sale proceeds (if prices provided)
-   - Optionally add proceeds to cash balance (user preference)
-   - Remove holding if quantity = 0
-4. If quantity increased or values changed:
-   - Save updated values as provided by user
-   - Optionally adjust cash balance (user preference)
-5. Recalculate P/L based on updated values
-6. Save all changes - no historical tracking, only current state stored
-6. Update database
-7. Refresh holdings table
-8. Display success message
+3. Save updated values as provided by user (no constraints or validations)
+4. If quantity = 0, optionally delete holding
+5. Recalculate current value: `Quantity × Current Price`
+6. Recalculate account totals and portfolio totals
+7. Save all changes (no historical tracking, only current state)
+8. Update database
+9. Refresh holdings table
+10. Display success message
 
 **Acceptance Criteria:**
 - [ ] Edit form pre-populated with existing data
@@ -504,146 +520,131 @@ Investments Page
 
 ### FR-3: Deposits, Withdrawals & Transfers Page
 
-**Purpose:** Track capital deposits into accounts, withdrawals from accounts, and transfers between accounts to maintain accurate portfolio funding history and available cash balances.
+**Purpose:** Track capital deposits into accounts and transfers between accounts to maintain an **immutable audit trail** for total capital invested and annualized return calculations. These records form the historical audit trail and **cannot be edited** (only added or deleted).
 
-#### FR-3.1: Deposits, Withdrawals & Transfers Table
-**Description:** Display all deposit, withdrawal, and transfer transactions in chronological order.
+**Key Principle:** Deposits and transfers are **immutable** (add/delete only) to preserve audit history for tracking total invested capital over time.
+
+#### FR-3.1: Deposits & Transfers Table
+**Description:** Display all deposit and transfer transactions in chronological order with **immutable records**.
 
 **Required Columns:**
 1. **Date** - Transaction date
-2. **Type** - "Deposit", "Withdrawal", or "Transfer"
-3. **Account** - Source/destination account
+2. **Type** - "Deposit" or "Transfer"
+3. **Account** - Destination account (for Deposits)
 4. **From Account** - Source account (for Transfers only)
 5. **To Account** - Destination account (for Transfers only)
-6. **Amount** - Transaction amount (always positive value)
-7. **Currency** - Transaction currency
+6. **Amount** - Transaction amount (always positive value) - **Required**
+7. **Fee** - Transaction fee (optional, defaults to 0)
 8. **Description/Notes** - Optional text description
-9. **Actions** - Edit and Delete buttons
+9. **Actions** - Delete button only (NO Edit button - immutable)
 
 **Display Requirements:**
 - Sorted by date (most recent first by default)
 - Deposits shown with single account (green indicator)
-- Withdrawals shown with single account (red indicator)
 - Transfers shown with From → To account flow (orange indicator)
 - Currency displayed with amount
 - Responsive table (stacks on mobile)
+- **NO EDIT BUTTON** - records are immutable
+- Delete option available (to remove incorrect entries - user can re-add)
 
 **Calculated Totals (displayed above or below table):**
 - Total Deposits (all accounts)
-- Total Withdrawals (all accounts)
 - Total Transfers (net should be $0 across all accounts)
-- Net Capital Contributed by Account: (Deposits - Withdrawals + Transfers In - Transfers Out)
+- Net Capital Contributed by Account: (Deposits + Transfers In - Transfers Out)
 
 **Acceptance Criteria:**
-- [ ] All deposits, withdrawals, and transfers displayed
+- [ ] All deposits and transfers displayed
 - [ ] Sorted chronologically (newest first)
-- [ ] Type clearly distinguished (Deposit vs Withdrawal vs Transfer)
+- [ ] Type clearly distinguished (Deposit vs Transfer)
 - [ ] Transfer flow (From → To) clearly visible
-- [ ] Totals calculated correctly
+- [ ] Only Delete action available (no Edit)
+- [ ] Totals calculated correctly for audit purposes
 - [ ] Responsive design on mobile
 
-#### FR-3.2: Add Deposit
-**Description:** Record a capital deposit into a specific account.
+#### FR-3.2: Add Deposit (IMMUTABLE)
+**Description:** Record a capital deposit into a specific account. **This creates an immutable audit record that cannot be edited later.**
 
 **Required Form Fields:**
-1. **Date** - Date picker (default: today)
-2. **Account** - Dropdown (ZA, TFSA, US, EUR, Prop)
-3. **Amount** - Numeric input (positive only)
-4. **Currency** - Dropdown (values from Settings)
-5. **Description** - Text input (optional)
+1. **Date** - Date picker (default: today) - **Required**
+2. **Account** - Dropdown (ZA, TFSA, US, EUR, Prop) - **Required**
+3. **Amount** - Numeric input (positive only) - **Required**
+
+**Optional Form Fields:**
+4. **Fee** - Numeric input (defaults to 0) - Optional
+5. **Currency** - Dropdown (values from Settings) - Optional
+6. **Description** - Text input - Optional
 
 **Behavior:**
 - "Add Deposit" button opens form
+- Only amount, date, and account are required
+- Fee field is optional (defaults to 0)
 - Validate amount > 0
 - On submit:
-  1. Save deposit to database
-  2. **Optionally increase account's Cash Balance by amount** (automatic or manual - user preference)
-  3. Refresh Deposits, Withdrawals & Transfers table
-  4. Update Summary Dashboard totals
-  5. Display success message
+  1. Create **immutable** deposit record in database
+  2. Deposit added to audit trail for total invested calculations
+  3. User may manually adjust account cash balance separately (optional)
+  4. Refresh Deposits & Transfers table
+  5. Update Summary Dashboard totals
+  6. Display success message
 
-**Impact on Account:**
-- `Account.CashBalance += Deposit.Amount` (if automatic balance updates enabled)
-- **Note:** Cash balance can always be manually adjusted separately if automatic updates are disabled
+**Post-Creation:**
+- ✅ Deposit appears in audit trail
+- ❌ **CANNOT be edited** (immutable for audit purposes)
+- ✅ CAN be deleted if incorrect (user re-adds with correct values)
+- ✅ User manually adjusts account cash balance if desired
 
 **Total Deposited Calculation:**
-For each account: `Total Deposited = Sum(Deposits) - Sum(Withdrawals) + Sum(Transfers In) - Sum(Transfers Out)`
+For each account: `Total Deposited = Sum(Deposits) + Sum(Transfers In) - Sum(Transfers Out)`
 
 **Acceptance Criteria:**
-- [ ] Form accessible from Deposits, Withdrawals & Transfers page
-- [ ] All fields validated
-- [ ] Deposit saved to database
-- [ ] Account cash balance optionally increases based on settings
-- [ ] Cash balance remains manually editable at all times
-- [ ] Dashboard reflects updated totals
+- [ ] Form accessible from Deposits & Transfers page
+- [ ] Only amount, date, and account required
+- [ ] Fee field optional (defaults to 0)
+- [ ] Amount validated (must be > 0)
+- [ ] Deposit saved as **immutable record**
+- [ ] NO EDIT OPTION after creation
+- [ ] Delete option available for corrections
+- [ ] Dashboard reflects updated total deposited
 - [ ] Success message displayed
 
-#### FR-3.3: Add Withdrawal
-**Description:** Record a capital withdrawal from a specific account.
+#### FR-3.3: Add Transfer (IMMUTABLE)
+**Description:** Record a transfer of funds from one account to another. **This creates an immutable audit record that cannot be edited later.**
 
 **Required Form Fields:**
-1. **Date** - Date picker (default: today)
-2. **Account** - Dropdown (ZA, TFSA, US, EUR, Prop)
-3. **Amount** - Numeric input (positive only)
-4. **Currency** - Dropdown (values from Settings)
-5. **Description** - Text input (optional)
+1. **Date** - Date picker (default: today) - **Required**
+2. **From Account** - Dropdown (ZA, TFSA, US, EUR, Prop) - **Required**
+3. **To Account** - Dropdown (ZA, TFSA, US, EUR, Prop) - **Required** (must be different from "From Account")
+4. **Amount** - Numeric input (positive only) - **Required**
 
-**Behavior:**
-- "Add Withdrawal" button opens form
-- Validate amount > 0
-- No enforcement of cash balance sufficiency - values can be edited manually
-- On submit:
-  1. Save withdrawal to database
-  2. **Optionally decrease account's Cash Balance by amount** (automatic or manual - user preference)
-  3. Refresh Deposits, Withdrawals & Transfers table
-  4. Update Summary Dashboard totals
-  5. Display success message
-
-**Impact on Account:**
-- `Account.CashBalance -= Withdrawal.Amount` (if automatic balance updates enabled)
-- **Note:** Cash balance can always be manually adjusted separately if automatic updates are disabled
-
-**Acceptance Criteria:**
-- [ ] Form accessible from Deposits, Withdrawals & Transfers page
-- [ ] All fields validated
-- [ ] Withdrawal saved to database
-- [ ] Account cash balance optionally decreases based on settings
-- [ ] Cash balance remains manually editable at all times
-- [ ] Dashboard reflects updated totals
-- [ ] Success message displayed
-
-#### FR-3.4: Add Transfer
-**Description:** Record a transfer of funds from one account to another.
-
-**Required Form Fields:**
-1. **Date** - Date picker (default: today)
-2. **From Account** - Dropdown (ZA, TFSA, US, EUR, Prop)
-3. **To Account** - Dropdown (ZA, TFSA, US, EUR, Prop) - must be different from "From Account"
-4. **Amount** - Numeric input (positive only)
-5. **Currency** - Dropdown (values from Settings)
-6. **Description** - Text input (optional)
+**Optional Form Fields:**
+5. **Fee** - Numeric input (defaults to 0) - Optional
+6. **Currency** - Dropdown (values from Settings) - Optional
+7. **Description** - Text input - Optional
 
 **Behavior:**
 - "Add Transfer" button opens form
+- Only amount, date, from account, and to account are required
+- Fee field is optional (defaults to 0)
 - Validate amount > 0
 - Validate From Account ≠ To Account
 - On submit:
-  1. Save transfer to database
-  2. **Optionally decrease From Account's Cash Balance by amount** (automatic or manual - user preference)
-  3. **Optionally increase To Account's Cash Balance by amount** (automatic or manual - user preference)
-  4. Refresh Deposits, Withdrawals & Transfers table
+  1. Create **immutable** transfer record in database
+  2. Transfer added to audit trail for tracking capital movement
+  3. User may manually adjust both account cash balances separately (optional)
+  4. Refresh Deposits & Transfers table
   5. Update Summary Dashboard
   6. Display success message
+
+**Post-Creation:**
+- ✅ Transfer appears in audit trail
+- ❌ **CANNOT be edited** (immutable for audit purposes)
+- ✅ CAN be deleted if incorrect (user re-adds with correct values)
+- ✅ User manually adjusts account cash balances if desired
 
 **Impact on Accounts:**
 - From Account: `FromAccount.CashBalance -= Transfer.Amount` (if automatic balance updates enabled)
 - To Account: `ToAccount.CashBalance += Transfer.Amount` (if automatic balance updates enabled)
 - **Note:** Cash balances can always be manually adjusted separately if automatic updates are disabled
-- To Account: `ToAccount.CashBalance += Transfer.Amount`
-
-**Validation:**
-- From Account must have sufficient cash balance (CashBalance >= Transfer.Amount)
-- Display error if insufficient funds: "Insufficient cash balance in [From Account]. Available: [CashBalance]"
 
 **Acceptance Criteria:**
 - [ ] Form accessible from Deposits, Withdrawals & Transfers page

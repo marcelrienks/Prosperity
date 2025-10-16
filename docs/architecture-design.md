@@ -597,14 +597,14 @@ func (r *AccountRepository) Update(account *Account) error
   "accountId": "acc_001",
   "type": "deposit",
   "amount": 10000.00,
+  "transactionFee": 0,
   "currency": "ZAR",
   "date": "2025-01-15T00:00:00Z",
-  "description": "Monthly deposit",
   "createdAt": "2025-01-15T10:00:00Z"
 }
 ```
 
-**Note:** Transaction amounts and descriptions are optional. Transactions serve as a record but do not automatically enforce cash balance updates unless configured by user preference.
+**Note:** Transaction amount is required. Transaction fee is optional (defaults to 0). Transactions serve as a record but do not automatically enforce cash balance updates unless configured by user preference.
 
 ### Partition Strategy
 
