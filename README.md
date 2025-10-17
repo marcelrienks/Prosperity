@@ -9,8 +9,6 @@ A modern web application for personal portfolio tracking, replacing Excel-based 
 [![Documentation](https://img.shields.io/badge/docs-complete-brightgreen.svg)](docs/README.md) 
 [![License](https://img.shields.io/badge/license-personal-lightgrey.svg)](#) 
 
----
-
 ## 🎯 Project Overview
 
 **Prosperity** is a personal portfolio tracker and overview tool designed to modernize and simplify stock investment tracking for personal use. Built as a learning project, it demonstrates a hybrid cloud architecture (AWS + Azure) using modern web technologies including Blazor WebAssembly and Go serverless functions.
@@ -33,8 +31,6 @@ A modern web application for personal portfolio tracking, replacing Excel-based 
 - 📥 **Import/Export** - Bulk CSV import/export for data portability
 - 🌓 **Light/Dark Themes** - Customizable appearance
 - ⚙️ **Configurable Settings** - Customize exchanges, industries, types, and actions
-
----
 
 ## 🏗️ Architecture Overview
 
@@ -81,8 +77,6 @@ Prosperity uses a **hybrid cloud architecture** combining AWS for static hosting
 
 [📐 View Detailed Architecture](docs/diagrams/system-architecture.md)
 
----
-
 ## 📚 Documentation
 
 Comprehensive documentation is available in the [`docs/`](docs/) directory:
@@ -106,8 +100,6 @@ Comprehensive documentation is available in the [`docs/`](docs/) directory:
 | [**Data Flow**](docs/diagrams/data-flow.md) | 10 diagrams | State management, calculations, currency conversion, API cycles |
 
 📖 **[Complete Documentation Index](docs/README.md)**
-
----
 
 ## 🚀 Getting Started
 
@@ -150,8 +142,6 @@ go build
 
 > **Note:** Detailed setup instructions will be added during core development.
 
----
-
 ## 📖 Key Concepts
 
 ### Accounts
@@ -180,8 +170,6 @@ Organize investments across multiple account types:
 - Automatic currency conversion using live exchange rates
 - Display in original currency or converted to ZAR
 - FX gain/loss tracking (future)
-
----
 
 ## 💡 Use Cases
 
@@ -214,8 +202,6 @@ Organize investments across multiple account types:
 
 [📋 View Detailed Use Case Flows](docs/diagrams/use-case-flows.md)
 
----
-
 ## 🎨 Screenshots & Mockups
 
 > Screenshots and mockups will be added during core development.
@@ -225,8 +211,6 @@ Organize investments across multiple account types:
 - Investments (Holdings Management)
 - Deposits & Transfers (Cash Flow)
 - Settings (Configuration)
-
----
 
 ## � Project Documentation
 
@@ -243,8 +227,6 @@ Organize investments across multiple account types:
 - ✅ Visual documentation (25 diagrams)
 
 [� View Project Status](docs/project-roadmap.md)
-
----
 
 ## 📊 Architecture Summary
 
@@ -266,8 +248,6 @@ Organize investments across multiple account types:
   - Azure: $0.28/month
   - External APIs: Free tier
 - **Comparison:** 85% savings vs. traditional VPS hosting
-
----
 
 ## 🛠️ Development
 
@@ -311,8 +291,6 @@ Prosperity/
 - **Commits:** Conventional commit messages (feat:, fix:, docs:)
 - **Documentation:** Keep diagrams and docs in sync with code
 
----
-
 ## 🔐 Security
 
 ### Authentication
@@ -332,8 +310,6 @@ Prosperity/
 - JWT validation on all API requests
 
 [🔒 View Security Architecture](docs/architecture-design.md#security-architecture)
-
----
 
 ## 💰 Cost Analysis
 
@@ -355,8 +331,6 @@ Prosperity/
 
 [💵 View Detailed Cost Analysis](docs/architecture-design.md#cost-analysis)
 
----
-
 ## 🤝 Contributing
 
 This is currently a **personal learning project** not open for external contributions. However, feedback and suggestions are welcome!
@@ -366,23 +340,17 @@ This is currently a **personal learning project** not open for external contribu
 - Share ideas for improvements
 - Report documentation errors
 
----
-
 ## 📝 License
 
 This is a personal project developed for individual use and learning purposes.
 
 **Copyright © 2025 Marcel Rienks. All rights reserved.**
 
----
-
 ## 📧 Contact
 
 **Project Owner:** Marcel Rienks
 
 **Repository:** [github.com/marcelrienks/Prosperity](https://github.com/marcelrienks/Prosperity)
-
----
 
 ## 🙏 Acknowledgments
 
@@ -401,8 +369,6 @@ This is a personal project developed for individual use and learning purposes.
 - [Azure Architecture Center](https://learn.microsoft.com/azure/architecture/)
 - [AWS Well-Architected Framework](https://aws.amazon.com/architecture/well-architected/)
 
----
-
 ## 📚 Further Reading
 
 ### Documentation Deep Dives
@@ -416,8 +382,6 @@ This is a personal project developed for individual use and learning purposes.
 - **Multi-Currency:** [Currency Conversion Flow](docs/diagrams/data-flow.md#multi-currency-conversion-flow)
 - **Cash Balances:** [Cash Management Flow](docs/diagrams/data-flow.md#cash-balance-management-flow)
 - **State Management:** [Fluxor Pattern](docs/diagrams/data-flow.md#state-management-fluxor)
-
----
 
 ## 🎓 Learning Goals
 
@@ -451,8 +415,6 @@ This project serves as a hands-on learning experience for:
 - Security best practices
 - Cost optimization
 
----
-
 ## 📈 Success Metrics
 
 The project will be considered successful if it:
@@ -479,13 +441,10 @@ The project will be considered successful if it:
 - Understanding of hybrid cloud architectures
 - Exposure to modern web development practices
 
----
-
 ## 🔮 Future Vision
 
 ### Post-MVP Features
 - 📊 Advanced charting (Chart.js, D3.js)
----
 
 ## 📝 Outstanding Planning Items
 
@@ -508,8 +467,6 @@ The following items require further definition before or during implementation:
 - Create wireframes or mockups for key pages
 - Document component styling standards
 
----
-
 ### 9. Error Handling Standards
 **Current Status:** General error handling mentioned
 
@@ -526,8 +483,6 @@ Create `docs/error-handling-standards.md` with:
 - Error response format specifications
 - Retry and timeout policies
 
----
-
 ### 10. API Documentation
 **Current Status:** API endpoints listed but not fully documented
 
@@ -543,15 +498,11 @@ Create `docs/error-handling-standards.md` with:
 - Document all request/response formats
 - Define error response standards
 
----
-
 <div align="center">
 
 **Built with ❤️ as a learning project**
 
 [View Documentation](docs/README.md) • [Architecture](docs/architecture-design.md) • [Diagrams](docs/diagrams/README.md) • [Roadmap](docs/project-roadmap.md)
-
----
 
 ⭐ **Star this repository** if you find the documentation useful!
 
